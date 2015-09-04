@@ -12,25 +12,33 @@ sys.setdefaultencoding('utf8')
 
 class FileHandle(mail.MailCreate):
     """docstring for FileHandle"""
-    def __init__(self, sendername,keysfile , errorIdfile):
+    def __init__(self, sendername,keysfile , eventsIdfile):
         super(FileHandle, self).__init__(sendername)
         self.keyfile = keysfile
-        self.errorIdfile = errorIdfile
+        self.eventsIdfile = eventsIdfile
 
-    def errorIdread(self):
+    def eventsIdread(self):
         '''
         从文件中读取已经发送过邮件的事件ID
         返回一个list
         '''
-        print "errorIdread"
+        print "eventsIdread"
         errorId = []
-        if os.path.exists( self.errorIdfile ):
-            with open( self.errorIdfile ) as errors:
+        if os.path.exists( self.eventsIdfile ):
+            with open( self.eventsIdfile ) as errors:
                 for error in errors:
                     if not error.isspace():
                         errorId.append( error.strip() )
-
         return errorId
+
+    def eventsIdadd(self,newId):
+        '''
+        向EventsID.txt文件中加入一个事件ID
+        返回一个list
+        '''
+        tmp = open(self.eventsIdfile,'a')
+        tmp.write(newId+'\n')
+        tmp.close()
 
     def keyWordsread(self):
         '''
@@ -92,11 +100,23 @@ class FileHandle(mail.MailCreate):
             else:
                 return md5temp
 
+    def eventsIdCheck(self,newId,eventsIdlist):
+        '''
+        通过ID确定事件是否已经被发送过
+        返回一个list
+        '''
+        temp = []
+        if ( len(eventsIdlist) > 0 ):
+            for eventId in eventsIdlist:
+                 if not eventId.isspace():
+                    temp.append( cmp( eventId,newId ) )
+        return temp
+
 
 
 if __name__ == '__main__':
     test = FileHandle('filehandle','KeyWords.txt' , 'ErrorId360.txt')
-    #print test.errorIdread()
+    #print test.eventsIdread()
     #for key in test.keyWordsread():
     #    print key
     a=test.fileMd5get()

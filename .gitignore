@@ -4,3 +4,23 @@
 KeyWords.txt
 
 test.py
+
+*.pyc
+
+*.pyc
+
+*.pyc
+
+EventsID.txt
+
+*.txt
+
+*.txt
+
+ErrorId360.txt
+
+ErrorId.txt
+
+Common/filehandle.pyc
+
+Common/ErrorId360.txt
