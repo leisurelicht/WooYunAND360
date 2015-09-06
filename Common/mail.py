@@ -23,8 +23,7 @@ class MailCreate(object):
         '''
         super(MailCreate, self).__init__()
         self.mailName = sendername
-        self.count = 0
-        self.count1 =0
+        self.count = 0 #邮箱认证尝试连接次数,超过3次则更换邮箱
         self.Mail = 'MailOne'
         try:
             self.config = ConfigParser()
@@ -83,7 +82,7 @@ class MailCreate(object):
         没有返回值
         函数内调用_format_addr()
         '''
-        print 'sendTextEmail'
+        print 'sendTextEmail %s ' % title
         msg = MIMEText(message,'plain','utf-8')#中文参数‘utf-8’，单字节字符不需要
         msg[ 'From' ] = self._format_addr( u'%s<%s>' % ( self.mailName,self.sender ) )
         msg[ 'Subject' ] = Header( title )
@@ -102,8 +101,8 @@ class MailCreate(object):
                     msg[ 'To' ] = self._format_addr(u'Admin<%s>' % self.receiver_admin )
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
             except  smtplib.SMTPAuthenticationError:
+                print '认证失败,邮箱连接可能出问题了'
                 self.count += 1
-                self.count1 += 1
                 if (self.count<3):
                     time.sleep(10)
                     continue

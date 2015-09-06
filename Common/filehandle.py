@@ -66,7 +66,18 @@ class FileHandle(mail.MailCreate):
                 filemd5.update( filetemp.read().strip() )
                 md5temp = filemd5.hexdigest()
         except Exception as e:
-            print e
+            errortext = "Error in functon : \" %s \" ,\n \
+            Error name is : \" %s \" ,\n \
+            Error type is : \" %s \" ,\n \
+            Error Message is : \" %s \" ,\n \
+            Error doc is : \" %s \" , \n " % \
+            (sys._getframe().f_code.co_name,\
+             e.__class__.__name__,\
+             e.__class__,\
+             e,\
+             e.__class__.__doc__)
+            #print errortext
+            self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
         return md5temp
 
     def fileMd5check(self,oldfilemd5):
@@ -77,10 +88,11 @@ class FileHandle(mail.MailCreate):
         '''
         print 'fileMd5check'
         try:
-            filemd5 = hashlib.md5()
-            with open(self.keyfile) as filetemp:
-                filemd5.update( filetemp.read().strip() )
-                md5temp = filemd5.hexdigest()
+            #filemd5 = hashlib.md5()
+            #with open(self.keyfile) as filetemp:
+            #    filemd5.update( filetemp.read().strip() )
+            #    md5temp = filemd5.hexdigest()
+            md5temp = self.fileMd5get()
         except Exception as e:
             errortext = "Error in functon : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
@@ -88,10 +100,10 @@ class FileHandle(mail.MailCreate):
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" , \n " % \
             (sys._getframe().f_code.co_name,\
-            e.__class__.__name__,\
-            e.__class__,\
-            e,\
-            e.__class__.__doc__)
+             e.__class__.__name__,\
+             e.__class__,\
+             e,\
+             e.__class__.__doc__)
             #print errortext
             self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
         else:
@@ -105,6 +117,7 @@ class FileHandle(mail.MailCreate):
         通过ID确定事件是否已经被发送过
         返回一个list
         '''
+        print 'eventsIdCheck'
         temp = []
         if ( len(eventsIdlist) > 0 ):
             for eventId in eventsIdlist:

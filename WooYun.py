@@ -15,7 +15,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         super(WooYun, self).__init__('WooYun监看机器人',keysfile,eventsIdfile)
         self.wooyun_url = 'http://api.wooyun.org/bugs/submit'
         self.eventsIdlist = self.eventsIdread()
-        self.keyWordlist = self.keyWordsread()
+        self.keyWordslist = self.keyWordsread()
         self.fileMd5 = self.fileMd5get()
         self.count = 0
 
@@ -35,8 +35,21 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 time.sleep(30)
                 continue
             except requests.exceptions.ConnectTimeout:
-                time.sleep(30)
+                time.sleep(60)
                 continue
+            except requests.exceptions.HTTPError as e:
+                errortext = "Error in function : \" %s \" ,\n \
+                Error name is : \" %s \" ,\n \
+                Error type is : \" %s \" ,\n \
+                Error Message is : \" %s \" ,\n \
+                Error doc is : \" %s \" \n" % \
+                (sys._getframe().f_code.co_name,\
+                 e.__class__.__name__,\
+                 e.__class__,\
+                 e,\
+                 e.__class__.__doc__)
+                self.sendTextEmail( 'Important Program Exception' , errortext , 'ExceptionInfo' )
+                time.sleep(600)
             except Exception as e:
                 errortext = "Error in function : \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
@@ -53,7 +66,11 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             else:
                 if text.status_code == 200:
                     text = text.content
-                break
+                    break
+                else:
+                    errortext = "Page Code %s " % text.status_code
+                    self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
+                    continue
         return text
 
     def dataAchieve(self,text):
@@ -91,11 +108,12 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         没有返回值
         '''
         print 'keyWordscheck'
+
         try:
             for detail in data:
-                for Key in self.keyWordlist:
+                for Key in self.keyWordslist:
                     if detail.get('title').find(Key) != -1:
-                        self.sendRecord(detail.get('title'),detail.get('link'),detail.get('id'))
+                        self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
                         break
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
@@ -104,12 +122,11 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" \n" % \
             (sys._getframe().f_code.co_name,\
-            e.__class__.__name__,\
-            e.__class__,\
-            e,\
-            e.__class__.__doc__)
+             e.__class__.__name__,\
+             e.__class__,\
+             e,\
+             e.__class__.__doc__)
             self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
-
 
     def sendRecord(self,eventTitle,eventURL,eventID):
         '''
@@ -123,7 +140,6 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             try:
                 #pass #test to use
                 self.sendTextEmail(eventTitle,eventURL,'securityInfo')
-                #aise Exception("Mail send error") #test
             except Exception as e:
                 errortext = "Error in function : \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
@@ -143,9 +159,8 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         else:
             print eventTitle," Same thing was sent,did not send same mail to everyone"
 
-
 if __name__ == '__main__':
-    test = WooYun('KeyWords.txt' , 'EventsID.txt')
+    test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
     robot = test.dataRequest()
     data = test.dataAchieve(robot)
     test.keyWordscheck(data)
