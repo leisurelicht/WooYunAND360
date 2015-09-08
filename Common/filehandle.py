@@ -4,11 +4,13 @@
 import os
 import sys
 import time
+import logging
 import hashlib
 import mail
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+logging.basicConfig()
 
 class FileHandle(mail.MailCreate):
     """docstring for FileHandle"""
