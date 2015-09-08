@@ -9,8 +9,11 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr , formataddr
 from ConfigParser import ConfigParser
 
+
+
 reload(sys)
 sys.setdefaultencoding('utf8')
+#logging.basicConfig()
 
 
 class MailCreate(object):
@@ -88,18 +91,29 @@ class MailCreate(object):
         msg[ 'Subject' ] = Header( title )
         while True:
             try:
-                smtp = smtplib.SMTP( self.smtpserver , 25 )
+
+                #smtp = smtplib.SMTP( self.smtpserver , 25 , timeout = 30 )
+                smtp = smtplib.SMTP()
                 #smtp.set_debuglevel(1)
+                print '开始尝试连接邮箱'
+                smtp.connect(self.smtpserver)
+                print '成功连接邮箱'
+                print '开始尝试登陆邮箱'
                 smtp.login( self.username , self.password )
+                print '成功登陆邮箱'
                 if (messagetype == "securityInfo"):
+                    print '开始发送邮件'
                     msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
                     # 这里有receiver为多个人时无法正确被格式化.
                     # ','join(self.receiver)无法正确格式化,%s长度有限制
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
+                    print '成功发送邮件'
                 else:
+                    print '开始发送邮件'
                     msg[ 'To' ] = self._format_addr(u'Admin<%s>' % self.receiver_admin )
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
+                    print '成功发送邮件'
             except  smtplib.SMTPAuthenticationError:
                 print '认证失败,邮箱连接可能出问题了'
                 self.count += 1
@@ -107,6 +121,7 @@ class MailCreate(object):
                     time.sleep(10)
                     continue
                 else:
+                    print '正在更换邮箱尝试中'
                     self.mailInit('backup')
                     self.count = 0
                     continue
@@ -122,7 +137,7 @@ class MailCreate(object):
                  e,\
                  e.__class__.__doc__)
                 print text
-                time.sleep(5)
+                #time.sleep(5)
                 continue
             else:
                 smtp.quit()
@@ -141,7 +156,7 @@ class mail(MailCreate):
 if __name__ == '__main__':
 
     test = MailCreate('测试机器人')
-    test.sendTextEmail("test",'test message',"securityInfo")
+    test.sendTextEmail("test",'test message',"timerepoert")
 
     #test2 = mail('测试机器人')
     #while True:
