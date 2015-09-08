@@ -4,11 +4,14 @@ import requests
 import re
 import sys
 import time
+import random
+import logging
 from bs4 import BeautifulSoup
 from Common import mail , filehandle
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+logging.basicConfig()
 
 class fix360(filehandle.FileHandle,mail.MailCreate):
     """docstring for fix360"""
@@ -30,7 +33,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         从360补天获取最新的10页事件
         返回一个存储网页的list
         '''
-        print 'dataRequest'
+        print '360_dataRequest'
         urls = []
         htmls = []
         for num in range(1,11):
@@ -75,6 +78,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                 else:
                     if page.status_code == 200:
                         htmls.append(page.content)
+                        #time.sleep(random.randint(0,60))
                         break
                     else:
                         errortext = "Page Code %s " % page.status_code
@@ -87,7 +91,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         获取事件名和链接
         返回一个{链接:事件名}型的字典
         '''
-        print 'dataAchieve'
+        print '360_dataAchieve'
         events = {}
         for page in pages:
             while True:
@@ -122,7 +126,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         函数内调用sendRecord()
         没有返回值
         '''
-        print 'keyWordscheck'
+        print '360_keyWordscheck'
         tempFileMd5 = self.fileMd5check(self.fileMd5)
         if tempFileMd5:
             self.fileMd5 = tempFileMd5
@@ -151,7 +155,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         没有返回值
         函数内调用sendTextEmail()
         '''
-        print 'sendRecord'
+        print '360_sendRecord'
         checkresult = self.eventsIdCheck(eventID,self.eventsIdlist)
         if 0 not in checkresult:
             try:
