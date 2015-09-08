@@ -4,10 +4,12 @@ import requests
 import sys
 import time
 import json
+import logging
 from Common import mail , filehandle
 
 reload(sys)
 sys.setdefaultencoding('utf8')
+logging.basicConfig()
 
 class WooYun(filehandle.FileHandle,mail.MailCreate):
     """docstring for WooYun"""
@@ -27,7 +29,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         从乌云API获取json格式的数据
         返回json格式的数据
         '''
-        print 'dataRequest'
+        print 'WooYun_dataRequest'
         while True:
             try:
                 text = requests.get(self.wooyun_url , timeout = 30 )
@@ -77,7 +79,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         '''
         将json格式的数据取出
         '''
-        print 'dataAchieve'
+        print 'WooYun_dataAchieve'
         try :
             data = json.loads(text)
             #raise Exception("data is not json")
@@ -107,7 +109,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         内部调用sendRecord()
         没有返回值
         '''
-        print 'keyWordscheck'
+        print 'WooYun_keyWordscheck'
 
         try:
             for detail in data:
@@ -134,7 +136,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         没有返回值
         函数内调用sendTextEmail()
         '''
-        print 'sendRecord'
+        print 'WooYun_sendRecord'
         checkresult = self.eventsIdCheck(eventID,self.eventsIdlist)
         if 0 not in checkresult:
             try:
