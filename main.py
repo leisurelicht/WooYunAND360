@@ -39,7 +39,7 @@ def Start():
     runWooYun()
 
 if __name__ == '__main__':
-    runtimeStart()
+    Start()
     scheduler = BackgroundScheduler()
     scheduler.add_job(run360,'interval', seconds=1800)
     scheduler.add_job(runWooYun,'interval', seconds=60)

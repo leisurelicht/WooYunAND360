@@ -24,15 +24,16 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
 
-    def dataRequest(self):
+    def dataRequest(self,url=self):
         '''
         从乌云API获取json格式的数据
         返回json格式的数据
         '''
         print 'WooYun_dataRequest'
+        url = url or self.url
         while True:
             try:
-                text = requests.get(self.wooyun_url , timeout = 30 )
+                text = requests.get(url , timeout = 30 )
             except requests.exceptions.ConnectionError:
                 time.sleep(30)
                 continue
@@ -163,7 +164,8 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
 if __name__ == '__main__':
     test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
-    robot = test.dataRequest()
-    data = test.dataAchieve(robot)
-    test.keyWordscheck(data)
+    robot = test.dataRequest('')
+    #data = test.dataAchieve(robot)
+    #test.keyWordscheck(data)
 
+    print robot
