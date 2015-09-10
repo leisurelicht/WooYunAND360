@@ -24,7 +24,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
 
-    def dataRequest(self,url=self):
+    def dataRequest(self,url=None):
         '''
         从乌云API获取json格式的数据
         返回json格式的数据
