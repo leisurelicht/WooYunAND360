@@ -30,10 +30,10 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         返回json格式的数据
         '''
         print 'WooYun_dataRequest'
-        url = url or self.url
+        url = url or self.wooyun_url
         while True:
             try:
-                text = requests.get(url , timeout = 30 )
+                text = requests.get( url , timeout = 30 )
             except requests.exceptions.ConnectionError:
                 time.sleep(30)
                 continue
@@ -98,8 +98,12 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
             self.dataRequest()
         else:
-            md5value = self.fileMd5check(self.fileMd5)
-            if md5value:
+            #md5value = self.fileMd5check(self.fileMd5)
+            #if md5value:
+            #    self.keyWordsread()
+            #    self.fileMd5 = md5value
+            md5value = self.fileMd5get()
+            if md5value != self.fileMd5:
                 self.keyWordsread()
                 self.fileMd5 = md5value
         return data
@@ -165,7 +169,6 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 if __name__ == '__main__':
     test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
     robot = test.dataRequest('')
-    #data = test.dataAchieve(robot)
-    #test.keyWordscheck(data)
-
-    print robot
+    data = test.dataAchieve(robot)
+    test.keyWordscheck(data)
+    #print robot
