@@ -116,7 +116,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                     #title3 = soup.find_all(href=re.compile("/vul/search/"))
                     #titles = title1 + title2 +title3
                     for title in titles:
-                        events[ title['href'] ] = title.string
+                        events[ title['href'] ] = title.string.strip()
                     break
         return events
 
@@ -135,7 +135,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
             for (_360url,_360title) in events.items():
                 for Key in self.keyWordlist:
                     if Key in _360title:
-                        self.sendRecord( _360title.strip() , self._360baseurl + _360url , _360url.split('/')[-1] )
+                        self.sendRecord( _360title , self._360baseurl + _360url , _360url.split('/')[-1] )
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
