@@ -60,6 +60,7 @@ class MailCreate(object):
 
         try:
             self.smtpserver = self.config.get(self.Mail,"SmtpServer").strip()
+            self.smtpserver_port = self.config.get(self.Mail,"SmtpServer_Port").strip()
             self.sender = self.config.get(self.Mail,"SenderMail")
             self.receiver = self.config.get(self.Mail,"ReceiverMail").split(',')
             self.receiver_admin = self.config.get(self.Mail,"ReceiverMail_Admin").split(',')
@@ -96,7 +97,7 @@ class MailCreate(object):
                 smtp = smtplib.SMTP()
                 #smtp.set_debuglevel(1)
                 print '开始尝试连接邮箱'
-                smtp.connect(self.smtpserver)
+                smtp.connect(self.smtpserver,self.smtpserver_port)
                 print '成功连接邮箱'
                 print '开始尝试登陆邮箱'
                 smtp.login( self.username , self.password )
@@ -105,13 +106,13 @@ class MailCreate(object):
                     print '开始发送邮件'
                     msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
                     # 这里有receiver为多个人时无法正确被格式化.
-                    # ','join(self.receiver)无法正确格式化,%s长度有限制
+                    # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
                     print '成功发送邮件'
                 else:
                     print '开始发送邮件'
-                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % self.receiver_admin )
+                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送邮件'
             except  smtplib.SMTPAuthenticationError:
@@ -121,7 +122,7 @@ class MailCreate(object):
                     time.sleep(10)
                     continue
                 else:
-                    print '正在更换邮箱尝试中'
+                    print '正在尝试更换邮箱...'
                     self.mailInit('backup')
                     self.count = 0
                     continue
@@ -156,7 +157,8 @@ class mail(MailCreate):
 if __name__ == '__main__':
 
     test = MailCreate('测试机器人')
-    test.sendTextEmail("test",'test message',"timerepoert")
+    #test.sendTextEmail("test",'good',"securityInfo")
+    test.sendTextEmail("test",'good',"timereport")
 
     #test2 = mail('测试机器人')
     #while True:
