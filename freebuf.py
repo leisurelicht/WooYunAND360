@@ -115,9 +115,6 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
                     self.dataRequest()
                 else:
                     titles = soup.find_all(href=re.compile("/bugs/vulbox"),target="_blank")
-                    #title2 = soup.find_all(href=re.compile("/company/info/id/"))
-                    #title3 = soup.find_all(href=re.compile("/vul/search/"))
-                    #titles = title1 + title2 +title3
                     for title in titles:
                         events[ title['href'] ] = title.string.strip()
                     break
@@ -161,9 +158,6 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
         函数内调用sendTextEmail()
         '''
         print 'freebuf_sendRecord'
-        print eventTitle
-        print eventURL
-        print eventID
         checkresult = self.eventsIdCheck(eventID,self.eventsIdlist)
         if 0 not in checkresult:
             try:
