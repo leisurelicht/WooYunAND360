@@ -18,7 +18,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
     def __init__(self, keysfile,eventsIdfile):
         super(FreeBuf, self).__init__('漏洞盒子监看机器人',keysfile,eventsIdfile)
         self.freeBufurl = 'https://www.vulbox.com/board/internet/page/'
-        self.freeBufbaseurl = 'https://www.vulbox.com/'
+        self.freeBufbaseurl = 'https://www.vulbox.com'
         self.eventsIdlist = self.eventsIdread()
         self.keyWordlist = self.keyWordsread()
         self.fileMd5 = self.fileMd5get()
