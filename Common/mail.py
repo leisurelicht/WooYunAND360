@@ -28,13 +28,13 @@ class MailCreate(object):
         self.mailName = sendername
         self.count = 0 #邮箱认证尝试连接次数,超过3次则更换邮箱
         self.Mail = 'MailOne'
+        self.Mailchoose = True
         try:
             self.config = ConfigParser()
             self.config.read( 'mailconfig.ini' )
         except Exception as e :
-            print e
             raise e
-        self.mailInit('main')
+        self.mailInit() #mailInit函数只在此处被调用
 
     def _format_addr(self,s):
         '''
@@ -45,18 +45,22 @@ class MailCreate(object):
         return formataddr(( Header(name,'utf-8').encode(),\
                           addr.encode('utf-8') if isinstance(addr,unicode) else addr ))
 
-    def mailInit(self,mailchoose):
+    def mailInit(self):
         """
         初始化邮件设置
         返回邮件的参数
         函数内部调用sendMail()
         """
         print 'mailInit'
-        if( mailchoose == 'backup' ):
-            if ( self.Mail == 'MailOne' ):
-                self.Mail = 'MailTwo'
-            elif ( self.Mail == 'MailTwo' ):
-                self.Mail ='MailOne'
+        if self.Mailchoose:
+            self.Mail == 'MailOne'
+        else:
+            self.Mail == 'MailTwo'
+        #if( mailchoose == 'backup' ):
+        #    if ( self.Mail == 'MailOne' ):
+        #        self.Mail = 'MailTwo'
+        #    elif ( self.Mail == 'MailTwo' ):
+        #        self.Mail ='MailOne'
 
         try:
             self.smtpserver = self.config.get(self.Mail,"SmtpServer").strip()
@@ -103,18 +107,18 @@ class MailCreate(object):
                 smtp.login( self.username , self.password )
                 print '成功登陆邮箱'
                 if (messagetype == "securityInfo"):
-                    print '开始发送邮件'
+                    print '开始发送事件邮件'
                     msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
                     # 这里有receiver为多个人时无法正确被格式化.
                     # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
-                    print '成功发送邮件'
+                    print '成功发送事件邮件'
                 else:
-                    print '开始发送邮件'
+                    print '开始发送问题邮件'
                     msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
-                    print '成功发送邮件'
+                    print '成功发送问题邮件'
             except  smtplib.SMTPAuthenticationError:
                 print '认证失败,邮箱连接可能出问题了'
                 self.count += 1
@@ -123,7 +127,9 @@ class MailCreate(object):
                     continue
                 else:
                     print '正在尝试更换邮箱...'
-                    self.mailInit('backup')
+                    self.Mailchoose = not self.Mailchoose
+                    self.mailInit(self.mailchoose)
+                    #self.mailInit('backup')
                     self.count = 0
                     continue
             except Exception as e :
