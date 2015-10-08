@@ -4,6 +4,7 @@ import requests
 import sys
 import time
 import json
+import socket
 import logging
 from Common import mail , filehandle
 
@@ -20,6 +21,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         self.keyWordslist = self.keyWordsread()
         self.fileMd5 = self.fileMd5get()
         self.count = 0
+        socket.setdefaulttimeout = 30
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
@@ -33,12 +35,25 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         url = url or self.wooyun_url
         while True:
             try:
+                if self.count > 10:
+                    self.sendTextEmail( 'Important Program Exception' , 'Target url can not reach' , 'ExceptionInfo' )
+                    continue
                 text = requests.get( url , timeout = 30 )
+            except socket.timeout:
+                time.sleep(30)
+                self.count += 1
+                continue
             except requests.exceptions.ConnectionError:
                 time.sleep(30)
+                self.count += 1
                 continue
             except requests.exceptions.ConnectTimeout:
                 time.sleep(60)
+                self.count += 1
+                continue
+            except requests.exceptions.ReadTimeout:
+                time.sleep(10)
+                self.count += 1
                 continue
             except requests.exceptions.HTTPError as e:
                 errortext = "Error in function : \" %s \" ,\n \
@@ -53,6 +68,8 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                  e.__class__.__doc__)
                 self.sendTextEmail( 'Important Program Exception' , errortext , 'ExceptionInfo' )
                 time.sleep(600)
+                self.count += 1
+                continue
             except Exception as e:
                 errortext = "Error in function : \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
@@ -65,12 +82,16 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                  e,\
                  e.__class__.__doc__)
                 self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
+                self.count += 1
                 continue
             else:
                 if text.status_code == 200:
                     text = text.content
+                    self.count = 0
                     break
                 else:
+                    if text.status_code == 522:
+                        continue
                     errortext = "Page Code %s " % text.status_code
                     self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
                     continue
