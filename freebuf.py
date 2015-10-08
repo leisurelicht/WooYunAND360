@@ -23,7 +23,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
         self.keyWordlist = self.keyWordsread()
         self.fileMd5 = self.fileMd5get()
         self.html = 0
-        self.count = 0
+        #self.count = 0
 
     def __del__(self):
         print '漏洞盒子监看机器人 is shutdown'
@@ -185,6 +185,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
 
 
 if __name__ == '__main__':
+
     robot = FreeBuf('keyWords.txt' , './Events/EventsIDfreebuf.txt')
     robot.keyWordscheck(robot.dataAchieve(robot.dataRequest()))
 
