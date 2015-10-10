@@ -49,7 +49,6 @@ class MailCreate(object):
         """
         初始化邮件设置
         返回邮件的参数
-        函数内部调用sendMail()
         """
         print 'mailInit'
         if self.Mailchoose:
