@@ -41,7 +41,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         for url in urls:
             while True:
                 try:
-                    page = requests.get( url , timeout =30)
+                    page = requests.get( url , timeout = 30)
                 except requests.exceptions.ConnectionError:
                     time.sleep(30)
                     continue
@@ -77,7 +77,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                     continue
                 else:
                     if page.status_code == 200:
-                        htmls.append(page.content)
+                        htmls.append(page.content) #get page content
                         #time.sleep(random.randint(0,60))
                         break
                     else:
