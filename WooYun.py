@@ -6,6 +6,7 @@ import time
 import json
 import socket
 import logging
+from bs4 import BeautifulSoup
 from Common import mail , filehandle
 
 reload(sys)
@@ -22,6 +23,16 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         self.fileMd5 = self.fileMd5get()
         self.count = 0
         socket.setdefaulttimeout = 30
+        self.headers = {
+        'Host' : 'www.wooyun.org',
+        'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
+        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language' : 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding' : 'gzip, deflate','DNT' : '1',
+        'Referer' : 'http://www.wooyun.org/index.php',
+        'Cookie' : 'Hm_lvt_c12f88b5c1cd041a732dea597a5ec94c=1443363836,1443364000,1443364038,1444381968; bdshare_firstime=1423619234389; __cfduid=d037debb012835d005205cd496bcdaf321437360051; PHPSESSID=un87r2ohvbnilkehpp5ckkgcd5; Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
+        'Connection' : 'keep-alive'
+        }
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
@@ -129,6 +140,71 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 self.fileMd5 = md5value
         return data
 
+    def descriptionAchieve(self,url):
+        '''
+        获取WooYun事件页面中的描述部分
+        返货描述部分
+        '''
+        print 'WooYun_descriptionAchieve'
+        while True:
+            try:
+                page = requests.get( url , headers = self.headers , timeout = 30 )
+            except requests.exceptions.ConnectionError , requests.exceptions.ConnectTimeout:
+                time.sleep(30)
+                continue
+            except requests.exceptions.HTTPError as e:
+                errortext = "Error in Function : \" %s \" ,\n \
+                Error Name is : \" %s \" , \n \
+                Error Type is : \" %s \" , \n \
+                Error Message : \" %S \" , \n \
+                Error Doc is : \" %s \" \n" % \
+                (sys._getframe().f_code.co_name,\
+                 e.__class__.name__,\
+                 e.__class__,\
+                 e,\
+                 e.__class__.__doc__)
+                self.sendTextEmail( 'Important Program Exception' , errortext , 'ExceptionInfo')
+                time.sleep(60)
+                continue
+            except Exception as e:
+                errortext = "Error is Function : \" %s \" , \n \
+                Error Name is : \" %s \" , \n \
+                Error Type is : \" %s \" , \n \
+                Error Message is : \" %s \" , \n \
+                Error Doc is : \" %s \" \n" % \
+                (sys._getframe().f_code.co_name,\
+                 e.__class__.__name__,\
+                 e.__class__,\
+                 e,\
+                 e.__class__.__doc__)
+                self.sendTextEmail( 'Program Exception 1' , errortext , 'ExceptionInfo' )
+                continue
+            else:
+                if page.status_code == 200:
+                    try:
+                        soup = BeautifulSoup(page.content)
+                    except Exception as e:
+                        errortext = "Error in function : \" %s \" ,\n \
+                        Error name is : \" %s \" ,\n \
+                        Error type is : \" %s \" ,\n \
+                        Error Message is : \" %s \" ,\n \
+                        Error doc is : \" %s \" \n" % \
+                        (sys._getframe().f_code.co_name,\
+                         e.__class__.__name__,\
+                         e.__class__,\
+                         e,\
+                         e.__class__.__doc__)
+                        self.sendTextEmail( 'Program Exception 2' , errortext , 'ExceptionInfo' )
+                        continue
+                    else:
+                        des = soup.find(class_="detail wybug_description").string.strip()
+                        return des
+                        break
+                else:
+                    print page.status_code
+                    break
+
+
     def keyWordscheck(self,data):
         '''
         检查获得的标题中是否含有要监看的关键字
@@ -139,6 +215,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
         try:
             for detail in data:
+                print detail.get('title')
                 for Key in self.keyWordslist:
                     if detail.get('title').find(Key) != -1:
                         self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
@@ -189,7 +266,9 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
 if __name__ == '__main__':
     test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
-    robot = test.dataRequest('')
-    data = test.dataAchieve(robot)
-    test.keyWordscheck(data)
+    #robot = test.dataRequest('')
+    #data = test.dataAchieve(robot)
+    #test.keyWordscheck(data)
     #print robot
+    print test.descriptionAchieve('http://www.wooyun.org/bugs/wooyun-2015-0145547')
+
