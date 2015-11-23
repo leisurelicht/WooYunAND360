@@ -34,9 +34,11 @@ class FileHandle(mail.MailCreate):
             return errorId
         else:
             filepath , filename = os.path.split( self.eventsIdfile )
-            os.makedirs(filepath)
-            tmp = open(self.eventsIdfile,'a')
-            tmp.close()
+            if not os.path.exists( filepath ):
+                os.makedirs( filepath )
+            else:
+                tmp = open( self.eventsIdfile,'a' )
+                tmp.close()
 
 
     def eventsIdadd(self,newId):
