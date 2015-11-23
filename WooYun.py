@@ -54,6 +54,10 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 time.sleep(30)
                 self.count += 1
                 continue
+            except requests.exceptions.Timeout:
+                time.sleep(30)
+                self.count += 1
+                continue
             except requests.exceptions.ConnectionError:
                 time.sleep(30)
                 self.count += 1
@@ -143,7 +147,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
     def descriptionAchieve(self,url):
         '''
         获取WooYun事件页面中的描述部分
-        返货描述部分
+        返回描述部分
         '''
         print 'WooYun_descriptionAchieve'
         while True:
@@ -270,5 +274,5 @@ if __name__ == '__main__':
     #data = test.dataAchieve(robot)
     #test.keyWordscheck(data)
     #print robot
-    print test.descriptionAchieve('http://www.wooyun.org/bugs/wooyun-2015-0145547')
+    #print test.descriptionAchieve('http://www.wooyun.org/bugs/wooyun-2015-0145547')
 
