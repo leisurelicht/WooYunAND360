@@ -97,7 +97,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
         for page in pages:
             while True:
                 try:
-                    soup = BeautifulSoup(page)
+                    soup = BeautifulSoup(page,"html5lib")
                 except Exception as e:
                     errortext = "\
                     Error in function : \" %s \" ,\n \
