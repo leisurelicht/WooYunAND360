@@ -1,11 +1,7 @@
 
 *.ini
 
-test.py
-
 *.pyc
 
 *.txt
-
-*.ini
 
