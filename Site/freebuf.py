@@ -4,7 +4,6 @@ import requests
 import re
 import sys
 import time
-import random
 import logging
 from bs4 import BeautifulSoup
 from Common import mail , filehandle

@@ -20,9 +20,13 @@
 
 BeautifulSoup4.3.2
 
+* pip install beautifulsoup4
+
 requests2.5.3
 
 apscheduler3.0.3
+
+* pip install apscheduler
 
 对漏洞盒子的监控需要支持ssl连接.
 
