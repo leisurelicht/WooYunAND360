@@ -33,15 +33,18 @@ class FileHandle(mail.MailCreate):
                         errorId.append( error.strip() )
             return errorId
         else:
+            filepath , filename = os.path.split( self.eventsIdfile )
+            os.makedirs(filepath)
             tmp = open(self.eventsIdfile,'a')
             tmp.close()
+
 
     def eventsIdadd(self,newId):
         '''
         向EventsID.txt文件中加入一个事件ID
         返回一个list
         '''
-        tmp = open(self.eventsIdfile,'a')
+        tmp = open( self.eventsIdfile,'a' )
         tmp.write(newId+'\n')
         tmp.close()
 
@@ -57,7 +60,11 @@ class FileHandle(mail.MailCreate):
                 for key in keys:
                     if not key.isspace():
                         keyWordslist.append( key.strip() )
-        return keyWordslist
+            return keyWordslist
+        else:
+            tmp = open( self.keyfile,'a' )
+            tmp.close()
+
 
     def fileMd5get(self):
         '''
