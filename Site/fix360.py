@@ -96,7 +96,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         for page in pages:
             while True:
                 try:
-                    soup = BeautifulSoup(page)
+                    soup = BeautifulSoup(page,"html5lib")
                 except Exception as e:
                     errortext = "Error in function : \" %s \" ,\n \
                     Error name is : \" %s \" ,\n \
