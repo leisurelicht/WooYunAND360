@@ -31,7 +31,10 @@ class FileHandle(mail.MailCreate):
                 for error in errors:
                     if not error.isspace():
                         errorId.append( error.strip() )
-        return errorId
+            return errorId
+        else:
+            tmp = open(self.eventsIdfile,'a')
+            tmp.close()
 
     def eventsIdadd(self,newId):
         '''
@@ -130,17 +133,19 @@ class FileHandle(mail.MailCreate):
 
 
 if __name__ == '__main__':
-    test = FileHandle('filehandle','KeyWords.txt' , 'ErrorId360.txt')
+    test = FileHandle('filehandle','KeyWords.txt' , '../Events/EventsID360.txt')
     #print test.eventsIdread()
     #for key in test.keyWordsread():
     #    print key
-    a=test.fileMd5get()
-    print a
+    #a=test.fileMd5get()
+    #print a
 
-    while True:
-        b=test.fileMd5check(a)
-        print b
-        if b:
-            a = b
-        time.sleep(5)
+    #while True:
+    #    b=test.fileMd5check(a)
+    #    print b
+    #    if b:
+    #        a = b
+    #    time.sleep(5)
+    print test.eventsIdread()
+
 
