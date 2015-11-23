@@ -2,9 +2,7 @@
 # -*- coding=utf-8 -*-
 import time
 import sched
-import fix360
-import WooYun
-import freebuf
+from Site import fix360,WooYun,freebuf
 from Common import mail
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
