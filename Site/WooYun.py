@@ -48,6 +48,8 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             try:
                 if self.count > 10:
                     self.sendTextEmail( 'Important Program Exception' , 'Target url can not reach' , 'ExceptionInfo' )
+                    self.count = 0
+                    time.sleep(100)
                     continue
                 text = requests.get( url , timeout = 30 )
             except socket.timeout:
