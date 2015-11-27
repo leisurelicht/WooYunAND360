@@ -18,11 +18,15 @@
 
 依赖的第三方包有:
 
+requests2.5.3
+
 BeautifulSoup4.3.2
 
 * pip install beautifulsoup4
 
-requests2.5.3
+在BeautifulSoup中使用了html5lib作为解析器
+
+* pip install html5lib
 
 apscheduler3.0.3
 
