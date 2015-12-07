@@ -1,0 +1,4 @@
+requests==2.5.3
+BeautifulSoup==4.3.2
+html5lib
+apscheduler3.0.3
