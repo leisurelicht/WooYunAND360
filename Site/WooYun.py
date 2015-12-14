@@ -109,9 +109,14 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 else:
                     if text.status_code == 522:
                         continue
-                    errortext = "Page Code %s " % text.status_code
-                    self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
-                    continue
+                    if text.status_code == 504:
+                        time.sleep(10)
+                        continue
+                        self.count += 1
+                    else:
+                        errortext = "Page Code %s " % text.status_code
+                        self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
+                        continue
         return text
 
     def dataAchieve(self,text):
