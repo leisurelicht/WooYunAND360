@@ -227,7 +227,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                     if detail.get('title').find(key1) != -1:
                         for value in values:
                             # 1. 检查第二关键字是否存在
-                            if detail.get('title').find(value['KEY2']) != -1:
+                            if detail.get('title').find(value.get('KEY2')) != -1:
                                 #print detail.get('title')
                                 self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
                                 break

@@ -138,7 +138,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                     if key1 in _360title:
                         for value in values:
                             # 1. 检查第二关键字是否存在
-                            if value["KEY2"] in _360title:
+                            if value.get('KEY2') in _360title:
                                 print _360title
                                 self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
                             #else：
