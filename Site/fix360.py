@@ -103,10 +103,10 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                     Error type is : \" %s \" ,\n \
                     Error Message is : \" %s \" ,\n \
                     Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
+                    (sys._getframe().f_code.co_name,
+                     e.__class__.__name__,
+                     e.__class__,
+                     e,
                      e.__class__.__doc__)
                     self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
                     self.dataRequest()
@@ -132,20 +132,28 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
             self.fileMd5 = tempFileMd5
             self.keyWordlist = self.keyWordsread()
         try:
-            for (_360url,_360title) in events.items():
-                for Key in self.keyWordlist:
-                    if Key in _360title:
-                        self.sendRecord( _360title , self._360baseurl + _360url , _360url.split('/')[-1] )
+            for (_360url,_360title) in events.iteritems():
+                #print _360title
+                for key1, values in self.keyWordlist.iteritems():
+                    if key1 in _360title:
+                        for value in values:
+                            # 1. 检查第二关键字是否存在
+                            if value["KEY2"] in _360title:
+                                print _360title
+                                self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                            #else：
+                            # 2. 进入页面检查厂商域名
+                            # 3. 在页面内查找是否存在第二关键字
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
             Error type is : \" %s \" ,\n \
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" \n" % \
-            (sys._getframe().f_code.co_name,\
-             e.__class__.__name__,\
-             e.__class__,\
-             e,\
+            (sys._getframe().f_code.co_name,
+             e.__class__.__name__,
+             e.__class__,
+             e,
              e.__class__.__doc__)
             self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
 
