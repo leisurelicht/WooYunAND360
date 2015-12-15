@@ -7,7 +7,7 @@ import json
 import socket
 import logging
 from bs4 import BeautifulSoup
-from Common import mail , filehandle
+from Common import mail, filehandle
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -79,9 +79,9 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 Error Message is : \" %s \" ,\n \
                 Error doc is : \" %s \" \n" % \
                 (sys._getframe().f_code.co_name,\
-                 e.__class__.__name__,\
-                 e.__class__,\
-                 e,\
+                 e.__class__.__name__,
+                 e.__class__,
+                 e,
                  e.__class__.__doc__)
                 self.sendTextEmail( 'Important Program Exception' , errortext , 'ExceptionInfo' )
                 time.sleep(600)
@@ -93,31 +93,30 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 Error type is : \" %s \" ,\n \
                 Error Message is : \" %s \" ,\n \
                 Error doc is : \" %s \" \n" % \
-                (sys._getframe().f_code.co_name,\
-                 e.__class__.__name__,\
-                 e.__class__,\
-                 e,\
+                (sys._getframe().f_code.co_name,
+                 e.__class__.__name__,
+                 e.__class__,
+                 e,
                  e.__class__.__doc__)
                 self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
                 self.count += 1
                 continue
             else:
                 if text.status_code == 200:
-                    text = text.content
                     self.count = 0
                     break
+                elif text.status_code == 522:
+                    continue
+                elif text.status_code == 504:
+                    time.sleep(30)
+                    self.count += 1
+                    continue
                 else:
-                    if text.status_code == 522:
-                        continue
-                    if text.status_code == 504:
-                        time.sleep(10)
-                        continue
-                        self.count += 1
-                    else:
-                        errortext = "Page Code %s " % text.status_code
-                        self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
-                        continue
+                    errortext = "Page Code %s " % text.status_code
+                    self.sendTextEmail( 'Page Error' , errortext , 'ExceptionInfo' )
+                    continue
         return text
+
 
     def dataAchieve(self,text):
         '''
@@ -125,7 +124,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         '''
         print 'WooYun_dataAchieve'
         try :
-            data = json.loads(text)
+            data = text.json()
             #raise Exception("data is not json")
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
@@ -133,18 +132,14 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             Error type is : \" %s \" ,\n \
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" \n" % \
-            (sys._getframe().f_code.co_name,\
-            e.__class__.__name__,\
-            e.__class__,\
-            e,\
+            (sys._getframe().f_code.co_name,
+            e.__class__.__name__,
+            e.__class__,
+            e,
             e.__class__.__doc__)
             self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
             self.dataRequest()
         else:
-            #md5value = self.fileMd5check(self.fileMd5)
-            #if md5value:
-            #    self.keyWordsread()
-            #    self.fileMd5 = md5value
             md5value = self.fileMd5get()
             if md5value != self.fileMd5:
                 self.keyWordsread()
@@ -164,15 +159,15 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 time.sleep(30)
                 continue
             except requests.exceptions.HTTPError as e:
-                errortext = "Error in Function : \" %s \" ,\n \
+                errortext = "Error is Function : \" %s \" , \n \
                 Error Name is : \" %s \" , \n \
                 Error Type is : \" %s \" , \n \
-                Error Message : \" %S \" , \n \
+                Error Message is : \" %s \" , \n \
                 Error Doc is : \" %s \" \n" % \
-                (sys._getframe().f_code.co_name,\
-                 e.__class__.name__,\
-                 e.__class__,\
-                 e,\
+                (sys._getframe().f_code.co_name,
+                 e.__class__.__name__,
+                 e.__class__,
+                 e,
                  e.__class__.__doc__)
                 self.sendTextEmail( 'Important Program Exception' , errortext , 'ExceptionInfo')
                 time.sleep(60)
@@ -209,11 +204,12 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                         continue
                     else:
                         des = soup.find(class_="detail wybug_description").string.strip()
-                        return des
                         break
+
                 else:
                     print page.status_code
                     break
+        return des
 
 
     def keyWordscheck(self,data):
@@ -226,23 +222,32 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
         try:
             for detail in data:
-                print detail.get('title')
-                for Key in self.keyWordslist:
-                    if detail.get('title').find(Key) != -1:
-                        self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
-                        break
+                #print detail.get('title')
+                for key1, values in self.keyWordslist.iteritems():
+                    if detail.get('title').find(key1) != -1:
+                        for value in values:
+                            # 1. 检查第二关键字是否存在
+                            if detail.get('title').find(value['KEY2']) != -1:
+                                #print detail.get('title')
+                                self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
+                                break
+                            #else：
+                            # 2. 进入页面检查厂商域名
+                            # 3. 在页面内查找是否存在第二关键字
+
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
             Error type is : \" %s \" ,\n \
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" \n" % \
-            (sys._getframe().f_code.co_name,\
-             e.__class__.__name__,\
-             e.__class__,\
-             e,\
+            (sys._getframe().f_code.co_name,
+             e.__class__.__name__,
+             e.__class__,
+             e,
              e.__class__.__doc__)
-            self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
+            print errortext
+            #self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
 
     def sendRecord(self,eventTitle,eventURL,eventID):
         '''
@@ -262,10 +267,10 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 Error type is : \" %s \" ,\n \
                 Error Message is : \" %s \" ,\n \
                 Error doc is : \" %s \" \n" % \
-                (sys._getframe().f_code.co_name,\
-                e.__class__.__name__,\
-                e.__class__,\
-                e,\
+                (sys._getframe().f_code.co_name,
+                e.__class__.__name__,
+                e.__class__,
+                e,
                 e.__class__.__doc__)
                 print errortext
                 #self.sendTextEmail( 'Program Exception' , errortext , 'ExceptionInfo' )
@@ -277,7 +282,6 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
 if __name__ == '__main__':
     test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
-    #robot = test.dataRequest('')
     #data = test.dataAchieve(robot)
     #test.keyWordscheck(data)
     #print robot
