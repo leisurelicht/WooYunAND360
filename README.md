@@ -16,37 +16,56 @@
 
 程序基于python2.7
 
-依赖的第三方包有:
-
-requests2.5.3
-
-* pip install requests
-
-BeautifulSoup4.3.2
-
-* pip install beautifulsoup4
-
-在BeautifulSoup中使用了html5lib作为解析器
-
-* pip install html5lib
-
-apscheduler3.0.3
-
-* pip install apscheduler
-
-对漏洞盒子的监控需要支持ssl连接.
-
-或者直接执行
+依赖包安装
 
 * pip install -r requirements.txt
 
-就可以了
 
 ----
 
-修改KeyWords.txt文件可以增加要监看的关键字.每个关键字后换行保存即可.
+修改KeyWords.txt文件可以增加要监看的关键字.格式为json.
 
-关键字通过与标题比对确定是否为需要监看的事件.
+基本格式为:
+
+    {
+        "%范围较大的第一个关键字%":
+        [
+            {
+                "KEY2":"%精确的第二个关键字%",
+                "URL1":"%域名%"  #不过暂时还没用
+            }
+        ]
+    }
+
+范例如下:
+
+    {
+        "基金":
+        [
+            {
+                "KEY2":"银华",
+                "URL1":"yufund.com.cn"
+            },
+            {
+                "KEY2":"嘉实",
+                "URL1":"jsfund.cn"
+            },
+            {
+                "KEY2":"长盛",
+                "URL1":"csfunds.com.cn"
+            }
+        ],
+        "银行":[
+            {
+                "KEY2":"宁夏",
+                "URL1":"bankofnx.com.cn",
+                "URL2":"ycccb.com.cn"
+            }
+        ]
+    
+    }
+
+关键字通过与标题逐级比对确定是否为需要监看的事件.
 
 ----
 
