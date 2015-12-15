@@ -1,9 +1,9 @@
 #! usr/bin/env python
-#-*- coding=utf-8 -*-
+# -*- coding=utf-8 -*-
 
 import os
 import sys
-import time
+import json
 import logging
 import hashlib
 import mail
@@ -11,6 +11,7 @@ import mail
 reload(sys)
 sys.setdefaultencoding('utf8')
 logging.basicConfig()
+
 
 class FileHandle(mail.MailCreate):
     """docstring for FileHandle"""
@@ -53,18 +54,30 @@ class FileHandle(mail.MailCreate):
     def keyWordsread(self):
         '''
         从文件中读取需要监看的关键字
-        返回一个list
+        返回一个json格式的数据
         '''
         print 'keyWordsread'
-        keyWordslist = []
-        if os.path.exists( self.keyfile ):
-            with open( self.keyfile ) as keys:
-                for key in keys:
-                    if not key.isspace():
-                        keyWordslist.append( key.strip() )
-            return keyWordslist
+        if os.path.exists(self.keyfile):
+            with open(self.keyfile) as keys:
+                tmp = keys.read()
+            try:
+                keywordslist = json.loads(tmp)
+            except Exception as e:
+                errortext = "Error in functon : \" %s \" ,\n \
+                Error name is : \" %s \" ,\n \
+                Error type is : \" %s \" ,\n \
+                Error Message is : \" %s \" ,\n \
+                Error doc is : \" %s \" , \n " % \
+                (sys._getframe().f_code.co_name,
+                 e.__class__.__name__,
+                 e.__class__,
+                 e,
+                 e.__class__.__doc__)
+                self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
+
+            return keywordslist
         else:
-            tmp = open( self.keyfile,'a' )
+            tmp = open(self.keyfile, 'a')
             tmp.close()
 
 
@@ -85,13 +98,13 @@ class FileHandle(mail.MailCreate):
             Error type is : \" %s \" ,\n \
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" , \n " % \
-            (sys._getframe().f_code.co_name,\
-             e.__class__.__name__,\
-             e.__class__,\
-             e,\
+            (sys._getframe().f_code.co_name,
+             e.__class__.__name__,
+             e.__class__,
+             e,
              e.__class__.__doc__)
             #print errortext
-            self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
+            self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
         return md5temp
 
     def fileMd5check(self,oldfilemd5):
@@ -113,13 +126,13 @@ class FileHandle(mail.MailCreate):
             Error type is : \" %s \" ,\n \
             Error Message is : \" %s \" ,\n \
             Error doc is : \" %s \" , \n " % \
-            (sys._getframe().f_code.co_name,\
-             e.__class__.__name__,\
-             e.__class__,\
-             e,\
+            (sys._getframe().f_code.co_name,
+             e.__class__.__name__,
+             e.__class__,
+             e,
              e.__class__.__doc__)
             #print errortext
-            self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
+            self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
         else:
             if oldfilemd5 == md5temp:
                 return False
@@ -130,6 +143,7 @@ class FileHandle(mail.MailCreate):
         '''
         通过ID确定事件是否已经被发送过
         返回一个list
+        如果list里包含0,则已被发送过
         '''
         print 'eventsIdCheck'
         temp = []
