@@ -73,7 +73,7 @@ class FileHandle(mail.MailCreate):
                  e.__class__,
                  e,
                  e.__class__.__doc__)
-                self.sendTextEmail("keyWordsread",errortext,"ExceptionInfo")
+                self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
 
             return keywordslist
         else:
@@ -104,7 +104,7 @@ class FileHandle(mail.MailCreate):
              e,
              e.__class__.__doc__)
             #print errortext
-            self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
+            self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
         return md5temp
 
     def fileMd5check(self,oldfilemd5):
@@ -132,7 +132,7 @@ class FileHandle(mail.MailCreate):
              e,
              e.__class__.__doc__)
             #print errortext
-            self.sendTextEmail("fileMd5check",errortext,"ExceptionInfo")
+            self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
         else:
             if oldfilemd5 == md5temp:
                 return False
