@@ -225,15 +225,22 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                 #print detail.get('title')
                 for key1, values in self.keyWordslist.iteritems():
                     if detail.get('title').find(key1) != -1:
-                        for value in values:
-                            # 1. 检查第二关键字是否存在
-                            if detail.get('title').find(value.get('KEY2')) != -1:
-                                #print detail.get('title')
-                                self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
-                                break
-                            #else：
-                            # 2. 进入页面检查厂商域名
-                            # 3. 在页面内查找是否存在第二关键字
+                        if values != []:
+                            for value in values:
+                                # 1. 检查第二关键字是否存在
+                                if value.get('KEY2') != None:
+                                    if detail.get('title').find(value.get('KEY2')) != -1:
+                                        #print '1.',detail.get('title')
+                                        self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
+                                    #else: #二级关键词不中的话继续查域名和内容
+                                        # 2. 进入页面检查厂商域名
+                                        # 3. 在页面内查找是否存在第二关键字
+                                elif value.get('KEY2') == None:
+                                    #print '2.',detail.get('title')
+                                    self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
+                        else:
+                            #print '3.',detail.get('title')
+                            self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
 
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \

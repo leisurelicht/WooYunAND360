@@ -131,11 +131,25 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
             self.fileMd5 = tempFileMd5
             self.keyWordlist = self.keyWordsread()
         try:
-            for (freeBufurl,freeBuftitle) in events.items():
-                for Key in self.keyWordlist:
-                    if Key in freeBuftitle:
-                        pass
-                        self.sendRecord( freeBuftitle , self.freeBufbaseurl + freeBufurl , freeBufurl.split('/')[-1] )
+            for (freeBufurl,freeBuftitle) in events.iteritems():
+                #print freeBuftitle
+                for key1, values in self.keyWordlist.iteritems():
+                    if key1 in freeBuftitle:
+                        if values != []:
+                            for value in values:
+                                if value.get('KEY2') != None:
+                                    if value.get('KEY2') in freeBuftitle:
+                                        #print '1',freeBuftitle
+                                        self.sendRecord(freeBuftitle, self.freeBufbaseurl + freeBufurl, freeBufurl.split('/')[-1])
+                                    #else: #二级关键词不中的话继续查域名和内容
+                                        # 2. 进入页面检查厂商域名
+                                        # 3. 在页面内查找是否存在第二关键字
+                                elif value.get('KEY2') == None:
+                                    #print '3',freeBuftitle
+                                    self.sendRecord(freeBuftitle, self.freeBufbaseurl + freeBufurl, freeBufurl.split('/')[-1])
+                        else:
+                            #print '2',freeBuftitle
+                            self.sendRecord(freeBuftitle, self.freeBufbaseurl + freeBufurl, freeBufurl.split('/')[-1])
         except Exception as e:
             errortext = "\
             Error in function : \" %s \" ,\n \

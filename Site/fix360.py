@@ -136,14 +136,22 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
                 #print _360title
                 for key1, values in self.keyWordlist.iteritems():
                     if key1 in _360title:
-                        for value in values:
-                            # 1. 检查第二关键字是否存在
-                            if value.get('KEY2') in _360title:
-                                print _360title
-                                self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
-                            #else：
-                            # 2. 进入页面检查厂商域名
-                            # 3. 在页面内查找是否存在第二关键字
+                        if values != []:
+                            for value in values:
+                                # 1. 检查第二关键字是否存在
+                                if value.get('KEY2') != None:
+                                    if value.get('KEY2') in _360title:
+                                        #print '1.',_360title
+                                        self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                                    #else: #二级关键词不中的话继续查域名和内容
+                                        # 2. 进入页面检查厂商域名
+                                        # 3. 在页面内查找是否存在第二关键字
+                                elif value.get('KEY2') == None:
+                                    #print '3.',_360title
+                                    self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                        else:
+                            #print '2.',_360title
+                            self.sendRecord(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
