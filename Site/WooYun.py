@@ -222,7 +222,6 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
 
         try:
             for detail in data:
-                #print detail.get('title')
                 for key1, values in self.keyWordslist.iteritems():
                     if detail.get('title').find(key1) != -1:
                         if values != []:
@@ -241,6 +240,8 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
                         else:
                             #print '3.',detail.get('title')
                             self.sendRecord(detail.get('title').strip(),detail.get('link'),detail.get('id'))
+                    else:
+                        print "事件中不存在监看关键词,开始检测下一个关键词"
 
         except Exception as e:
             errortext = "Error in function : \" %s \" ,\n \
