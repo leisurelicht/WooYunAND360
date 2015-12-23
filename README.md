@@ -23,7 +23,7 @@
 
 ----
 
-修改KeyWords.txt文件可以增加要监看的关键字.格式为json.
+修改 Config/KeyWords.txt 文件可以增加要监看的关键字.格式为json.
 
 基本格式为:
 
@@ -77,8 +77,7 @@
         "银行":[
             {
                 "KEY2":"宁夏",
-                "URL1":"bankofnx.com.cn",
-                "URL2":"ycccb.com.cn"
+                "URL1":"bankofnx.com.cn"
             }
         ],
         "同花顺":
@@ -96,7 +95,7 @@
 
 ----
 
-配置mailconfig.ini文件中的邮件设置.
+配置 Config/mailconfig.ini 文件中的邮件设置.
 
 [MailOne]为主要使用邮箱设置.
 
