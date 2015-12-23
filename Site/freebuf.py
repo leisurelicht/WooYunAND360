@@ -19,7 +19,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
         self.freeBufurl = 'https://www.vulbox.com/board/internet/page/'
         self.freeBufbaseurl = 'https://www.vulbox.com'
         self.eventsIdlist = self.eventsIdread()
-        self.keyWordlist = self.keyWordsread()
+        self.keyWordlist = self.keyWordsread
         self.fileMd5 = self.fileMd5get()
         self.html = 0
         #self.count = 0
@@ -129,7 +129,7 @@ class FreeBuf(filehandle.FileHandle,mail.MailCreate):
         tempFileMd5 = self.fileMd5check(self.fileMd5)
         if tempFileMd5:
             self.fileMd5 = tempFileMd5
-            self.keyWordlist = self.keyWordsread()
+            self.keyWordlist = self.keyWordsread
         try:
             for (freeBufurl,freeBuftitle) in events.iteritems():
                 #print freeBuftitle

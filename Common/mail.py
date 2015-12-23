@@ -1,13 +1,14 @@
 #! usr/bin/env python
 #-*- coding=utf-8 -*-
 
+import os
 import sys
 import time
 import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr , formataddr
-from ConfigParser import ConfigParser
+import ConfigParser
 
 
 
@@ -30,8 +31,8 @@ class MailCreate(object):
         self.Mail = 'MailOne'
         self.Mailchoose = True
         try:
-            self.config = ConfigParser()
-            self.config.read( 'mailconfig.ini' )
+            self.config = ConfigParser.ConfigParser()
+            self.config.read("../Config/mailconfig.ini")
         except Exception as e :
             raise e
         self.mailInit() #mailInit函数只在此处被调用
@@ -50,7 +51,7 @@ class MailCreate(object):
         初始化邮件设置
         返回邮件的参数
         """
-        print 'mailInit'
+        print "『"+'mailInit'+"』"+"邮箱初始化开始"
         if self.Mailchoose:
             self.Mail == 'MailOne'
         else:
@@ -69,6 +70,13 @@ class MailCreate(object):
             self.receiver_admin = self.config.get(self.Mail,"ReceiverMail_Admin").split(',')
             self.username = self.config.get(self.Mail,"MailName").strip()
             self.password = self.config.get(self.Mail,"MailPassword").strip()
+        except ConfigParser.NoSectionError:
+            print "*"*34
+            print "*"*10,"邮箱未进行配置","*"*10
+            print "*"*34
+            print "*"*12,"程序退出","*"*13
+            print "*"*34
+            exit(0)
         except Exception as e:
             text = "Error in function : \" %s \" ,\n \
             Error name is : \" %s \" ,\n \
@@ -93,7 +101,7 @@ class MailCreate(object):
         msg = MIMEText(message,'plain','utf-8')#中文参数‘utf-8’，单字节字符不需要
         msg[ 'From' ] = self._format_addr( u'%s<%s>' % ( self.mailName,self.sender ) )
         msg[ 'Subject' ] = Header( title )
-        while True:
+        while 1:
             try:
 
                 #smtp = smtplib.SMTP( self.smtpserver , 25 , timeout = 30 )
@@ -113,11 +121,16 @@ class MailCreate(object):
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
                     print '成功发送事件邮件'
-                else:
+                elif(messagetype == "ExceptionInfo"):
                     print '开始发送问题邮件'
                     msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送问题邮件'
+                elif(messagetype == "time_report"):
+                    print '开始发送运行报告邮件'
+                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
+                    print '成功发送运行报告邮件'
             except  smtplib.SMTPAuthenticationError:
                 print '认证失败,邮箱连接可能出问题了'
                 self.count += 1
@@ -151,10 +164,6 @@ class MailCreate(object):
                 break
 
 
-class mail(MailCreate):
-    """docstring for mail"""
-    def __init__(self, arg):
-        super(mail, self).__init__(arg)
 
 
 
@@ -163,7 +172,7 @@ if __name__ == '__main__':
 
     test = MailCreate('测试机器人')
     #test.sendTextEmail("test",'good',"securityInfo")
-    test.sendTextEmail("test",'good',"timereport")
+    #test.sendTextEmail("test",'good',"timereport")
 
     #test2 = mail('测试机器人')
     #while True:

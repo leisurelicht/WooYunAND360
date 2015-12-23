@@ -13,10 +13,10 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 logging.basicConfig()
 
-class WooYun(filehandle.FileHandle,mail.MailCreate):
+class WooYun(filehandle.FileHandle, mail.MailCreate):
     """docstring for WooYun"""
-    def __init__(self,keysfile,eventsIdfile):
-        super(WooYun, self).__init__('WooYun监看机器人',keysfile,eventsIdfile)
+    def __init__(self,keysfile, eventsIdfile):
+        super(WooYun, self).__init__('WooYun监看机器人', keysfile, eventsIdfile)
         self.wooyun_url = 'http://api.wooyun.org/bugs/submit'
         self.eventsIdlist = self.eventsIdread()
         self.keyWordslist = self.keyWordsread()
@@ -142,7 +142,7 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
         else:
             md5value = self.fileMd5get()
             if md5value != self.fileMd5:
-                self.keyWordsread()
+                self.keyWordsread
                 self.fileMd5 = md5value
         return data
 
@@ -289,9 +289,5 @@ class WooYun(filehandle.FileHandle,mail.MailCreate):
             print eventTitle," Same thing was sent,did not send same mail to everyone"
 
 if __name__ == '__main__':
-    test = WooYun('KeyWords.txt' , './Events/EventsID.txt')
-    #data = test.dataAchieve(robot)
-    #test.keyWordscheck(data)
-    #print robot
-    #print test.descriptionAchieve('http://www.wooyun.org/bugs/wooyun-2015-0145547')
+    robot_WooYun = WooYun('../Config/KeyWords.txt' , '../Events/EventsID.txt')
 

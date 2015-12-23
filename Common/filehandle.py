@@ -51,6 +51,7 @@ class FileHandle(mail.MailCreate):
         tmp.write(newId+'\n')
         tmp.close()
 
+
     def keyWordsread(self):
         '''
         从文件中读取需要监看的关键字
@@ -74,9 +75,9 @@ class FileHandle(mail.MailCreate):
                  e,
                  e.__class__.__doc__)
                 self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
-
             return keywordslist
         else:
+            print "关键词监看文件不存在"
             tmp = open(self.keyfile, 'a')
             tmp.close()
 
@@ -105,7 +106,8 @@ class FileHandle(mail.MailCreate):
              e.__class__.__doc__)
             #print errortext
             self.sendTextEmail("Program Exception",errortext,"ExceptionInfo")
-        return md5temp
+        else:
+            return md5temp
 
     def fileMd5check(self,oldfilemd5):
         '''

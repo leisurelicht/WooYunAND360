@@ -20,7 +20,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         self._360Fixurl = 'http://loudong.360.cn/vul/list'
         self._360baseurl = 'http://loudong.360.cn'
         self.eventsIdlist = self.eventsIdread()
-        self.keyWordlist = self.keyWordsread()
+        self.keyWordlist = self.keyWordsread
         self.fileMd5 = self.fileMd5get()
         self.html = 0
         self.count = 0
@@ -130,7 +130,7 @@ class fix360(filehandle.FileHandle,mail.MailCreate):
         tempFileMd5 = self.fileMd5check(self.fileMd5)
         if tempFileMd5:
             self.fileMd5 = tempFileMd5
-            self.keyWordlist = self.keyWordsread()
+            self.keyWordlist = self.keyWordsread
         try:
             for (_360url,_360title) in events.iteritems():
                 #print _360title
