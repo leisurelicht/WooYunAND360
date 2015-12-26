@@ -4,9 +4,9 @@ import pymongo
 from common import *
 
 
-def connect_wooyun(name):
+def connect_wooyun():
     try:
-        client = pymongo.MongoClient("localhost",'27017')
+        client = pymongo.MongoClient("localhost",27017)
     except Exception as e:
         error_text = exception_format(get_current_function_name(), e)
         print error_text
@@ -16,10 +16,15 @@ def connect_wooyun(name):
         return collection
 
 def insert_data(collection, data):
-    if isinstance(data, list):
-        collection.insert_manny(data)
-    else:
-        collection.insert(data)
+
+    try:
+        if isinstance(data, list):
+            collection.insert_many(data)
+        elif isinstance(data, dict):
+            collection.insert_one(data)
+    except Exception as e:
+        error_text = exception_format(get_current_function_name(), e)
+        print error_text
 
 
 
