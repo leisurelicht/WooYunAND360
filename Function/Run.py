@@ -27,7 +27,7 @@ def run_360():
     """
     调用fix360.py中的功能函数
     """
-    robot_360.key_words_check(robot_360.data_achieve(robot_360.data_request))
+    robot_360.key_words_check(robot_360.data_achieve(robot_360.data_request()))
 
 
 @robot_start_sign("WooYun爬虫机器人")
