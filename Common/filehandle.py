@@ -117,11 +117,7 @@ class FileHandle(mail.MailCreate):
         """
         print 'file_md5_check'
         try:
-            # filemd5 = hashlib.md5()
-            # with open(self.keyfile) as filetemp:
-            #    filemd5.update( filetemp.read().strip() )
-            #    md5temp = filemd5.hexdigest()
-            md5temp = self.file_md5_get()
+            md5temp = self.file_md5_get
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email("Program Exception", error_text, "ExceptionInfo")
