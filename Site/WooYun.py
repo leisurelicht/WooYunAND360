@@ -76,13 +76,13 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 self.count += 1
                 continue
             except requests.exceptions.HTTPError as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
                 time.sleep(600)
                 self.count += 1
                 continue
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
                 self.count += 1
                 continue
@@ -97,8 +97,8 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     self.count += 1
                     continue
                 else:
-                    errortext = "Page Code %s " % text.status_code
-                    self.send_text_email('Page Error', errortext, 'ExceptionInfo')
+                    error_text = "Page Code %s " % text.status_code
+                    self.send_text_email('Page Error', error_text, 'ExceptionInfo')
                     continue
 
     def data_achieve(self, text):
@@ -111,7 +111,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             data = text.json()
             # raise Exception("data is not json")
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
             self.data_request()
         else:
@@ -135,12 +135,12 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 time.sleep(30)
                 continue
             except requests.exceptions.HTTPError as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
                 time.sleep(60)
                 continue
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Program Exception 1', error_text, 'ExceptionInfo')
                 continue
             else:
@@ -148,7 +148,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     try:
                         soup = BeautifulSoup(page.content)
                     except Exception as e:
-                        error_text = exception_format(e)
+                        error_text = exception_format(get_current_function_name(), e)
                         self.send_text_email('Program Exception 2', error_text, 'ExceptionInfo')
                         continue
                     else:
@@ -192,7 +192,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                         print "事件中不存在监看关键词,开始检测下一个关键词"
 
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             print error_text
             # self.send_text_email( 'Program Exception' , errortext , 'ExceptionInfo' )
 
@@ -211,7 +211,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             try:
                 self.send_text_email(event_title, event_url, 'securityInfo')
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 print error_text
                 # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
             else:

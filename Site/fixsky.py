@@ -49,12 +49,12 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                     time.sleep(30)
                     continue
                 except requests.exceptions.HTTPError as e:
-                    error_text = exception_format(e)
+                    error_text = exception_format(get_current_function_name(), e)
                     self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
                     time.sleep(600)
                     continue
                 except Exception as e:
-                    error_text = exception_format(e)
+                    error_text = exception_format(get_current_function_name(), e)
                     self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
                     continue
                 else:
@@ -81,7 +81,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 try:
                     soup = BeautifulSoup(page, "html5lib")
                 except Exception as e:
-                    error_text = exception_format(e)
+                    error_text = exception_format(get_current_function_name(), e)
                     self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
                     self.data_request()
                 else:
@@ -128,7 +128,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                             # print '2.',_360title
                             self.send_record(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
 
     def send_record(self, event_title, event_url, event_id):
@@ -147,7 +147,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 # pass #test to use
                 self.send_text_email(event_title, event_url, 'securityInfo')
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 print error_text
                 # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
             else:

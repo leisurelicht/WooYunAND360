@@ -80,7 +80,7 @@ class FileHandle(mail.MailCreate):
             try:
                 keywordslist = json.loads(tmp)
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             else:
                 return keywordslist
@@ -102,7 +102,7 @@ class FileHandle(mail.MailCreate):
                 file_md5.update(filetemp.read().strip())
                 md5temp = file_md5.hexdigest()
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             self.send_text_email("Program Exception", error_text, "ExceptionInfo")
         else:
             return md5temp
@@ -123,7 +123,7 @@ class FileHandle(mail.MailCreate):
             #    md5temp = filemd5.hexdigest()
             md5temp = self.file_md5_get()
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             self.send_text_email("Program Exception", error_text, "ExceptionInfo")
         else:
             if old_file_md5 == md5temp:

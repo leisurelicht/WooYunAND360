@@ -38,7 +38,7 @@ class MailCreate(object):
             self.config = ConfigParser.ConfigParser()
             self.config.read("../Config/mailconfig.ini")
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
@@ -84,7 +84,7 @@ class MailCreate(object):
             print "*" * 34
             exit(0)
         except Exception as e:
-            error_text = exception_format(e)
+            error_text = exception_format(get_current_function_name(), e)
             print error_text
 
     def send_text_email(self, title, message, message_type):
@@ -141,7 +141,7 @@ class MailCreate(object):
                     self.count = 0
                     continue
             except Exception as e:
-                error_text = exception_format(e)
+                error_text = exception_format(get_current_function_name(), e)
                 print error_text
                 continue
             else:
