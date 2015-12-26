@@ -8,7 +8,7 @@ sys.setdefaultencoding('utf8')
 
 def get_current_function_name():
     """
-    获取当前函数名
+    动态的获取当前函数名
     :return: 函数名
     """
     return inspect.stack()[1][3]
