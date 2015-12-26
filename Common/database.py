@@ -3,10 +3,12 @@
 import pymongo
 from common import *
 
+host = "localhost"
+port = 27017
 
 def connect_wooyun():
     try:
-        client = pymongo.MongoClient("localhost",27017)
+        client = pymongo.MongoClient(host, port)
     except Exception as e:
         error_text = exception_format(get_current_function_name(), e)
         print error_text
@@ -15,20 +17,50 @@ def connect_wooyun():
         collection = db.wooyun
         return collection
 
-def insert_data(collection, data):
 
+def connect_fixsky():
     try:
-        if isinstance(data, list):
-            collection.insert_many(data)
-        elif isinstance(data, dict):
-            collection.insert_one(data)
+        client = pymongo.MongoClient(host, port)
+    except Exception as e:
+        error_text = exception_format(get_current_function_name(), e)
+        print error_text
+    else:
+        db = client.WooYunand360
+        collection = db.fixsky
+        return collection
+
+
+def connect_freebuf():
+    try:
+        client = pymongo.MongoClient(host, port)
+    except Exception as e:
+        error_text = exception_format(get_current_function_name(), e)
+        print error_text
+    else:
+        db = client.WooYunand360
+        collection = db.freebuf
+        return collection
+
+
+def insert_data(collection, database):
+    try:
+        if isinstance(database, list):
+            collection.insert_many(database)
+        elif isinstance(database, dict):
+            collection.insert_one(database)
     except Exception as e:
         error_text = exception_format(get_current_function_name(), e)
         print error_text
 
 
+def remove_date(collection):
+    collection.remove()
 
 
-if __name__=="__main__":
-    con=connect_wooyun("wooyun")
-    #insert_data(con, {"name":"freebuf"})
+if __name__ == "__main__":
+    con = connect_wooyun()
+    con.remove()
+    for data in con.find():
+        print data['title']
+
+        # insert_data(con, {"name":"freebuf"})
