@@ -62,12 +62,6 @@ class MailCreate(object):
             self.Mail = 'MailOne'
         else:
             self.Mail = 'MailTwo'
-        # if( mailchoose == 'backup' ):
-        #    if ( self.Mail == 'MailOne' ):
-        #        self.Mail = 'MailTwo'
-        #    elif ( self.Mail == 'MailTwo' ):
-        #        self.Mail ='MailOne'
-
         try:
             self.smtp_server = self.config.get(self.Mail, 'SmtpServer').strip()
             self.smtp_server_port = self.config.get(self.Mail, "SmtpServer_Port").strip()
