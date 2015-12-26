@@ -1,3 +1,5 @@
-from Function import Run
+import os
+from Function.Run import begin
 
-Run.begin()
+os.chdir('./Function')
+begin()
