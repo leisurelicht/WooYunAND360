@@ -5,7 +5,7 @@ import time
 import socket
 import logging
 from bs4 import BeautifulSoup
-from Common import mail, filehandle
+from Common import mail, filehandle, database
 from Common.common import *
 
 reload(sys)
@@ -35,6 +35,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
             'Connection': 'keep-alive'
         }
+        self.con = database.connect_wooyun()
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
@@ -107,19 +108,19 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         :param text: 来自data_request函数
         """
         print 'WooYun_dataAchieve'
-        try:
-            data = text.json()
-            # raise Exception("data is not json")
-        except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
-            self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-            self.data_request()
-        else:
-            md5value = self.file_md5_get
-            if md5value != self.fileMd5:
-                self.key_words_list = self.key_words_read
-                self.fileMd5 = md5value
-            return data
+        while 1:
+            try:
+                data = text.json()
+            except Exception as e:
+                error_text = exception_format(get_current_function_name(), e)
+                self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+                text = self.data_request()
+            else:
+                md5value = self.file_md5_get
+                if md5value != self.fileMd5:
+                    self.key_words_list = self.key_words_read
+                    self.fileMd5 = md5value
+                return data
 
     def description_achieve(self, url):
         """
@@ -223,3 +224,4 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot_WooYun = WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
+    robot_WooYun.data_achieve(robot_WooYun.data_request())
