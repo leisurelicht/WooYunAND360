@@ -17,9 +17,9 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
     """docstring for fix360"""
     def __init__(self, keys_file, events_id_file):
         super(FixSky, self).__init__('360补天监看机器人', keys_file, events_id_file)
-        self._360Fixurl = 'http://loudong.360.cn/vul/list'
-        self._360baseurl = 'http://loudong.360.cn'
-        self.eventsIdlist = self.events_id_read()
+        self._360fix_url = 'http://loudong.360.cn/vul/list'
+        self._360base_url = 'http://loudong.360.cn'
+        self.events_id_list = self.events_id_read()
         self.key_word_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
         self.html = 0
@@ -37,7 +37,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         urls = []
         htmls = []
         for num in range(1, 11):
-            urls.append(self._360Fixurl + '/page/%s' % num)
+            urls.append(self._360fix_url + '/page/%s' % num)
         for url in urls:
             while True:
                 try:
@@ -102,9 +102,9 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         :param events:
         """
         print '360_key_words_check'
-        tempfilemd5 = self.file_md5_check(self.fileMd5)
-        if tempfilemd5:
-            self.fileMd5 = tempfilemd5
+        temp_file_md5 = self.file_md5_check(self.fileMd5)
+        if temp_file_md5:
+            self.fileMd5 = temp_file_md5
             self.key_word_list = self.key_words_read
         try:
             for (_360url, _360title) in events.iteritems():
@@ -117,16 +117,16 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                                 if value.get('KEY2') is not None:
                                     if value.get('KEY2') in _360title:
                                         # print '1.',_360title
-                                        self.send_record(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                                        self.send_record(_360title, self._360base_url + _360url, _360url.split('/')[-1])
                                     # else: #二级关键词不中的话继续查域名和内容
                                         # 2. 进入页面检查厂商域名
                                         # 3. 在页面内查找是否存在第二关键字
                                 elif value.get('KEY2') is None:
                                     # print '3.',_360title
-                                    self.send_record(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                                    self.send_record(_360title, self._360base_url + _360url, _360url.split('/')[-1])
                         else:
                             # print '2.',_360title
-                            self.send_record(_360title, self._360baseurl + _360url, _360url.split('/')[-1])
+                            self.send_record(_360title, self._360base_url + _360url, _360url.split('/')[-1])
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
@@ -141,7 +141,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         :param event_title:
         """
         print '360_sendRecord'
-        check_result = self.events_id_check(event_id, self.eventsIdlist)
+        check_result = self.events_id_check(event_id, self.events_id_list)
         if 0 not in check_result:
             try:
                 # pass #test to use
@@ -151,7 +151,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 print error_text
                 # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
             else:
-                self.eventsIdlist.append(event_id)
+                self.events_id_list.append(event_id)
                 self.events_id_add(event_id)
         else:
             print event_title, " Same thing was sent,did not send same mail to everyone"
@@ -159,4 +159,4 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot = FixSky('../Config/keyWords.txt', '../Events/EventsID360.txt')
-    robot.key_words_check(robot.data_achieve(robot.data_request))
+    robot.key_words_check(robot.data_achieve(robot.data_request()))
