@@ -12,23 +12,6 @@ sys.setdefaultencoding('utf8')
 logging.basicConfig()
 
 
-def events_id_check(new_id, events_id_list):
-    """
-    通过ID确定事件是否已经被发送过
-    返回一个list
-    如果list里包含0,则已被发送过
-    :param new_id: 新事件的ID
-    :param events_id_list: 事件的ID集合
-    """
-    print 'events_id_check'
-    temp = []
-    if len(events_id_list) > 0:
-        for eventId in events_id_list:
-            if not eventId.isspace():
-                temp.append(cmp(eventId, new_id))
-    return temp
-
-
 class FileHandle(mail.MailCreate):
     """docstring for FileHandle"""
 
@@ -58,6 +41,23 @@ class FileHandle(mail.MailCreate):
                 tmp = open(self.events_Id_file, 'a')
                 tmp.close()
 
+    @staticmethod
+    def events_id_check(new_id, events_id_list):
+        """
+        通过ID确定事件是否已经被发送过
+        返回一个list
+        如果list里包含0,则已被发送过
+        :param new_id: 新事件的ID
+        :param events_id_list: 事件的ID集合
+        """
+        print 'events_id_check'
+        temp = []
+        if len(events_id_list) > 0:
+            for eventId in events_id_list:
+                if not eventId.isspace():
+                    temp.append(cmp(eventId, new_id))
+        return temp
+
     def events_id_add(self, new_id):
         """
         向EventsID.txt文件中加入一个事件ID
@@ -81,7 +81,7 @@ class FileHandle(mail.MailCreate):
                 keywordslist = json.loads(tmp)
             except Exception as e:
                 error_text = exception_format(e)
-                self.sendTextEmail("Program Exception", error_text, "ExceptionInfo")
+                self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             else:
                 return keywordslist
         else:
@@ -103,7 +103,7 @@ class FileHandle(mail.MailCreate):
                 md5temp = file_md5.hexdigest()
         except Exception as e:
             error_text = exception_format(e)
-            self.sendTextEmail("Program Exception", error_text, "ExceptionInfo")
+            self.send_text_email("Program Exception", error_text, "ExceptionInfo")
         else:
             return md5temp
 
@@ -112,6 +112,7 @@ class FileHandle(mail.MailCreate):
         检查文件的MD5值,确定文件是否发生改变
         没有发生改变返回False
         发生改变返回新的MD5值
+        :rtype: md5 or False
         :param old_file_md5:
         """
         print 'file_md5_check'
@@ -123,7 +124,7 @@ class FileHandle(mail.MailCreate):
             md5temp = self.file_md5_get()
         except Exception as e:
             error_text = exception_format(e)
-            self.sendTextEmail("Program Exception", error_text, "ExceptionInfo")
+            self.send_text_email("Program Exception", error_text, "ExceptionInfo")
         else:
             if old_file_md5 == md5temp:
                 return False

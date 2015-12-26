@@ -1,3 +1,3 @@
 from Function import Run
 
-Run.Begin()
+Run.begin()

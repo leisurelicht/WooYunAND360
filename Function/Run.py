@@ -2,7 +2,7 @@
 # -*- coding=utf-8 -*_
 import time
 import sched
-from Site import fix360, WooYun, freebuf
+from Site import fixsky, WooYun, freebuf
 from Common import mail
 from Common.decorators import *
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -16,7 +16,7 @@ def init():
     global robot_FreeBuf
     global robot_time_report
     scheduled = sched.scheduler(time.time, time.sleep)
-    robot_360 = fix360.fix360('../Config/KeyWords.txt', '../Events/EventsID360.txt')
+    robot_360 = fixsky.FixSky('../Config/KeyWords.txt', '../Events/EventsID360.txt')
     robot_WooYun = WooYun.WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
     robot_FreeBuf = freebuf.FreeBuf('../Config/KeyWords.txt', '../Events/EventsIDFreeBuf.txt')
     robot_time_report = mail.MailCreate('运行报告')
@@ -27,7 +27,7 @@ def run_360():
     """
     调用fix360.py中的功能函数
     """
-    robot_360.keyWordscheck(robot_360.dataAchieve(robot_360.dataRequest()))
+    robot_360.key_words_check(robot_360.data_achieve(robot_360.data_request))
 
 
 @robot_start_sign("WooYun爬虫机器人")
@@ -35,7 +35,7 @@ def run_wooyun():
     """
     调用WooYun.py中的功能函数
     """
-    robot_WooYun.keyWordscheck(robot_WooYun.dataAchieve(robot_WooYun.dataRequest()))
+    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.data_request()))
 
 
 @robot_start_sign("漏洞盒子爬虫机器人")
@@ -43,7 +43,7 @@ def run_freebuf():
     """
     调用freebuf.py中的功能函数
     """
-    robot_FreeBuf.keyWordscheck(robot_FreeBuf.dataAchieve(robot_FreeBuf.dataRequest()))
+    robot_FreeBuf.key_words_check(robot_FreeBuf.data_achieve(robot_FreeBuf.data_request()))
 
 
 @robot_start_sign("启动报告机器人")
@@ -51,7 +51,7 @@ def run_time_start():
     """
 
     """
-    robot_time_report.sendTextEmail('Start report', 'program start running', 'time_report')
+    robot_time_report.send_text_email('Start report', 'program start running', 'time_report')
 
 
 @robot_start_sign("运行报告机器人")
@@ -59,7 +59,7 @@ def run_time_report():
     """
 
     """
-    robot_time_report.sendTextEmail('Running report', 'program is running', 'time_report')
+    robot_time_report.send_text_email('Running report', 'program is running', 'time_report')
 
 
 def run_robot():
