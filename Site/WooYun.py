@@ -120,6 +120,8 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 if md5value != self.fileMd5:
                     self.key_words_list = self.key_words_read
                     self.fileMd5 = md5value
+                database.remove_date(self.con)
+                database.insert_data(self.con, data)
                 return data
 
     def description_achieve(self, url):
@@ -191,11 +193,10 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                             self.send_record(detail.get('title').strip(), detail.get('link'), detail.get('id'))
                     else:
                         print "事件中不存在监看关键词,开始检测下一个关键词"
-
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             print error_text
-            # self.send_text_email( 'Program Exception' , errortext , 'ExceptionInfo' )
+            self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
 
     def send_record(self, event_title, event_url, event_id):
         """

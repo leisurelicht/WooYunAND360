@@ -59,8 +59,8 @@ def remove_date(collection):
 
 if __name__ == "__main__":
     con = connect_wooyun()
-    con.remove()
-    for data in con.find():
-        print data['title']
+    #con.remove()
+    #for data in con.find():
+    #    print data['title']
 
         # insert_data(con, {"name":"freebuf"})
