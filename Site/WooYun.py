@@ -4,6 +4,8 @@ import requests
 import time
 import socket
 import logging
+from lxml import etree
+from tld import get_tld
 from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
 from Common.common import *
@@ -35,15 +37,16 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
             'Connection': 'keep-alive'
         }
-        self.con = database.connect_wooyun()
+        #self.con = database.connect_wooyun()
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
 
-    def data_request(self, url=None):
+    def data_request(self, url=None, header=None):
         """
         从乌云API获取json格式的数据
         返回json格式的数据
+        :param header:
         :param url:
         """
         print 'WooYun_dataRequest'
@@ -55,7 +58,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     self.count = 0
                     time.sleep(100)
                     continue
-                text = requests.get(url, timeout=30)
+                page = requests.get(url, timeout=30, headers=header)
             except socket.timeout:
                 time.sleep(30)
                 self.count += 1
@@ -88,17 +91,17 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 self.count += 1
                 continue
             else:
-                if text.status_code == 200:
+                if page.status_code == 200:
                     self.count = 0
-                    return text
-                elif text.status_code == 522:
+                    return page
+                elif page.status_code == 522:
                     continue
-                elif text.status_code == 504:
+                elif page.status_code == 504:
                     time.sleep(30)
                     self.count += 1
                     continue
                 else:
-                    error_text = "Page Code %s " % text.status_code
+                    error_text = "Page Code %s " % page.status_code
                     self.send_text_email('Page Error', error_text, 'ExceptionInfo')
                     continue
 
@@ -120,46 +123,46 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 if md5value != self.fileMd5:
                     self.key_words_list = self.key_words_read
                     self.fileMd5 = md5value
-                database.remove_date(self.con)
-                database.insert_data(self.con, data)
+                #database.remove_date(self.con)
+                #database.insert_data(self.con, data)
                 return data
 
-    def description_achieve(self, url):
+
+    def domain_description_achieve(self, url):
         """
-        获取WooYun事件页面中的描述部分
-        返回描述部分
-        :param url:
+        获取WooYun事件页面中的描述部分和厂商域名
+        :param url: wooyun漏洞页面
+        :return: （domain,description）domain可能为None, description可能为''
         """
-        print 'WooYun_descriptionAchieve'
-        while True:
-            try:
-                page = requests.get(url, headers=self.headers, timeout=30)
-            except requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout:
-                time.sleep(30)
-                continue
-            except requests.exceptions.HTTPError as e:
-                error_text = exception_format(get_current_function_name(), e)
-                self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
-                time.sleep(60)
-                continue
-            except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
-                self.send_text_email('Program Exception 1', error_text, 'ExceptionInfo')
-                continue
-            else:
-                if page.status_code == 200:
-                    try:
-                        soup = BeautifulSoup(page.content)
-                    except Exception as e:
-                        error_text = exception_format(get_current_function_name(), e)
-                        self.send_text_email('Program Exception 2', error_text, 'ExceptionInfo')
-                        continue
-                    else:
-                        des = soup.find(class_="detail wybug_description").string.strip()
-                        return des
+        print 'WooYun_domain_descriptionAchieve'
+        page = self.data_request(url=url, header=self.headers).content
+        try:
+            soup = BeautifulSoup(page, "html5lib")
+        except Exception as e:
+            error_text = exception_format(get_current_function_name(), e)
+            self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+        else:
+            des = soup.find(class_="detail wybug_description").string.strip() # 获取描述
+            url2 = soup.find('h3', class_="wybug_corp").a['href']
+            if url2:
+                page = self.data_request(url=url2, header=self.headers).content
+                if page:
+                    raw_domain = etree.HTML(page)
+                    # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
+                    #    return (None, des)
+                    if "厂商信息" in raw_domain.xpath('/html/head/title/text()')[0]:
+                        domain = get_tld(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
+                        return (domain, des)
                 else:
-                    print page.status_code
-                    continue
+                    return (None, des)
+            else:
+                return (None, des)
+
+
+
+
+
+            #return des
 
     def key_words_check(self, data):
         """
@@ -180,17 +183,22 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                 if value.get('KEY2') is not None:
                                     if detail.get('title').find(value.get('KEY2')) != -1:
                                         # print '1.',detail.get('title')
-                                        self.send_record(detail.get('title').strip(), detail.get('link'),
+                                        self.send_record(detail.get('title').strip(),
+                                                         detail.get('link'),
                                                          detail.get('id'))
-                                        # else: #二级关键词不中的话继续查域名和内容
+                                    # else: #二级关键词不中的话继续查域名和内容
                                         # 2. 进入页面检查厂商域名
                                         # 3. 在页面内查找是否存在第二关键字
                                 elif value.get('KEY2') is None:
                                     # print '2.',detail.get('title')
-                                    self.send_record(detail.get('title').strip(), detail.get('link'), detail.get('id'))
+                                    self.send_record(detail.get('title').strip(),
+                                                     detail.get('link'),
+                                                     detail.get('id'))
                         else:
                             # print '3.',detail.get('title')
-                            self.send_record(detail.get('title').strip(), detail.get('link'), detail.get('id'))
+                            self.send_record(detail.get('title').strip(),
+                                             detail.get('link'),
+                                             detail.get('id'))
                     else:
                         print "事件中不存在监看关键词,开始检测下一个关键词"
         except Exception as e:
@@ -225,4 +233,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot_WooYun = WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
-    robot_WooYun.data_achieve(robot_WooYun.data_request())
+    #robot_WooYun.data_achieve(robot_WooYun.data_request())
+    dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')
+    print dom
+    print des
