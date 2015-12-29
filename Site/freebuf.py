@@ -97,9 +97,9 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         :param events:
         """
         print 'freebuf_keyWordscheck'
-        tempfilemd5 = self.file_md5_check(self.fileMd5)
-        if tempfilemd5:
-            self.fileMd5 = tempfilemd5
+        temp_file_md5 = self.file_md5_check(self.fileMd5)
+        if temp_file_md5:
+            self.fileMd5 = temp_file_md5
             self.key_word_list = self.key_words_read
         try:
             for (freebuf_url, freebuf_title) in events.iteritems():
@@ -155,5 +155,5 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
 
-    robot = FreeBuf('keyWords.txt', '../Events/EventsIDfreebuf.txt')
+    robot = FreeBuf('../Config/keyWords.txt', '../Events/EventsIDfreebuf.txt')
     robot.key_words_check(robot.data_achieve(robot.data_request()))
