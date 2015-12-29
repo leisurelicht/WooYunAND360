@@ -77,20 +77,18 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         print '360_dataAchieve'
         events = {}
         for page in pages:
-            while True:
-                try:
-                    soup = BeautifulSoup(page, "html5lib")
-                except Exception as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-                    self.data_request()
-                else:
-                    titles = soup.find_all(href=re.compile("/vul/info/qid"))
-                    # title2 = soup.find_all(href=re.compile("/company/info/id/"))
-                    # title3 = soup.find_all(href=re.compile("/vul/search/"))
-                    # titles = title1 + title2 +title3
-                    for title in titles:
-                        events[title['href']] = title.string.strip()
+            try:
+                soup = BeautifulSoup(page, "html5lib")
+            except Exception as e:
+                error_text = exception_format(get_current_function_name(), e)
+                self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+            else:
+                titles = soup.find_all(href=re.compile("/vul/info/qid"))
+                # title2 = soup.find_all(href=re.compile("/company/info/id/"))
+                # title3 = soup.find_all(href=re.compile("/vul/search/"))
+                # titles = title1 + title2 +title3
+                for title in titles:
+                    events[title['href']] = title.string.strip()
                     break
         return events
 
