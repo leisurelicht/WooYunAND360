@@ -77,18 +77,16 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         print 'freebuf_dataAchieve'
         events = {}
         for page in pages:
-            while True:
-                try:
-                    soup = BeautifulSoup(page, "html5lib")
-                except Exception as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-                    self.data_request()
-                else:
-                    titles = soup.find_all(href=re.compile("/bugs/vulbox"), target="_blank")
-                    for title in titles:
-                        events[title['href']] = title.string.strip()
-                    break
+            try:
+                soup = BeautifulSoup(page, "html5lib")
+            except Exception as e:
+                error_text = exception_format(get_current_function_name(), e)
+                self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+            else:
+                titles = soup.find_all(href=re.compile("/bugs/vulbox"), target="_blank")
+                for title in titles:
+                    events[title['href']] = title.string.strip()
+                break
         return events
 
     def key_words_check(self, events):
