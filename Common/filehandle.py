@@ -79,8 +79,13 @@ class FileHandle(mail.MailCreate):
                 tmp = keys.read()
             try:
                 keywordslist = json.loads(tmp)
+            except (AttributeError, ValueError):
+                error_text = "请检查关键词文件格式是否正确"
+                print error_text
+                self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
+                print error_text
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             else:
                 return keywordslist
