@@ -103,8 +103,8 @@ class FileHandle(mail.MailCreate):
         print 'file_md5_get'
         try:
             file_md5 = hashlib.md5()
-            with open(self.key_file) as filetemp:
-                file_md5.update(filetemp.read().strip())
+            with open(self.key_file) as file_temp:
+                file_md5.update(file_temp.read().strip())
                 md5temp = file_md5.hexdigest()
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
@@ -112,26 +112,26 @@ class FileHandle(mail.MailCreate):
         else:
             return md5temp
 
-    def file_md5_check(self, old_file_md5):
-        """
-        检查文件的MD5值,确定文件是否发生改变
-        没有发生改变返回False
-        发生改变返回新的MD5值
-        :rtype: md5 or False
-        :param old_file_md5:
-        """
-        print 'file_md5_check'
-        try:
-            md5temp = self.file_md5_get
-        except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
-            self.send_text_email("Program Exception", error_text, "ExceptionInfo")
-        else:
-            if old_file_md5 == md5temp:
-                return False
-            else:
-                return md5temp
-        return False
+    # def file_md5_check(self, old_file_md5):
+    #     """
+    #     检查文件的MD5值,确定文件是否发生改变
+    #     没有发生改变返回False
+    #     发生改变返回新的MD5值
+    #     :rtype: md5 or False
+    #     :param old_file_md5:
+    #     """
+    #     print 'file_md5_check'
+    #     try:
+    #         md5temp = self.file_md5_get
+    #     except Exception as e:
+    #         error_text = exception_format(get_current_function_name(), e)
+    #         self.send_text_email("Program Exception", error_text, "ExceptionInfo")
+    #     else:
+    #         if old_file_md5 == md5temp:
+    #             return False
+    #         else:
+    #             return md5temp
+    #     return False
 
 if __name__ == '__main__':
     test = FileHandle('filehandle', 'KeyWords.txt', '../Events/EventsID360.txt')
