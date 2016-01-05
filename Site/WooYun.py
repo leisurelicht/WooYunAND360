@@ -172,7 +172,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         try:
             for detail in data:
                 title = detail.get('title').lower()
-                print title
+                #print title
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in title:
                         if values:
@@ -184,7 +184,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
                                                          detail.get('id'))
-                                    elif value.get('KEY2') in des:
+                                    elif des and value.get('KEY2') in des:
                                         # 2. 在事件描述中查找是否存在第二关键字
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
