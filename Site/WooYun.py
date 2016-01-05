@@ -130,7 +130,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         :param url: wooyun漏洞页面
         :return: （domain,description）domain可能为None, description可能为''
         """
-        print 'WooYun_domain_descriptionAchieve'
+        print 'WooYun_domain_description_achieve'
         page = self.data_request(url=url, header=self.headers).content
         try:
             soup = BeautifulSoup(page, "html5lib")
@@ -184,12 +184,12 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
                                                          detail.get('id'))
-                                    elif des and value.get('KEY2') in des:
+                                    elif des and (value.get('KEY2') in des):
                                         # 2. 在事件描述中查找是否存在第二关键字
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
                                                          detail.get('id'))
-                                elif value.get('URL') and dom and value.get('URL') in dom:
+                                elif value.get('URL') and dom and (value.get('URL') in dom):
                                     # 二级关键词不中的话继续查域名
                                     # 3. 进入页面检查厂商域名
                                     self.send_record(detail.get('title').strip(),
