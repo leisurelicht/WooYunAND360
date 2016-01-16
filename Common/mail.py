@@ -143,28 +143,6 @@ class MailCreate(object):
                 self.count = 0
                 break
 
-    def send_record(self, event_title, event_url, event_id):
-        """
-        调用邮件发送函数并记录被发送的事件ID
-        没有返回值
-        函数内调用sendTextEmail()
-        :param event_id:
-        :param event_url:
-        :param event_title:
-        """
-        check_result = self.events_id_check(event_id, self.events_id_list)
-        if 0 not in check_result:
-            try:
-                self.send_text_email(event_title, event_url, 'securityInfo')
-            except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
-                print error_text
-                # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
-            else:
-                self.events_id_list.append(event_id)
-                self.events_id_add(event_id)
-        else:
-            print event_title, " Same thing was sent,did not send same mail to everyone"
 
 
 if __name__ == '__main__':

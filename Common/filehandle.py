@@ -21,6 +21,8 @@ class FileHandle(mail.MailCreate):
         super(FileHandle, self).__init__(sender_name)
         self.key_file = keys_file
         self.events_Id_file = events_id_file
+        self.url = None  # 在上层初始化
+        self.events_id_list = []  # 在上层初始化
 
     def data_request(self):
         """
@@ -154,26 +156,29 @@ class FileHandle(mail.MailCreate):
         else:
             return md5temp
 
-    # def file_md5_check(self, old_file_md5):
-    #     """
-    #     检查文件的MD5值,确定文件是否发生改变
-    #     没有发生改变返回False
-    #     发生改变返回新的MD5值
-    #     :rtype: md5 or False
-    #     :param old_file_md5:
-    #     """
-    #     print 'file_md5_check'
-    #     try:
-    #         md5temp = self.file_md5_get
-    #     except Exception as e:
-    #         error_text = exception_format(get_current_function_name(), e)
-    #         self.send_text_email("Program Exception", error_text, "ExceptionInfo")
-    #     else:
-    #         if old_file_md5 == md5temp:
-    #             return False
-    #         else:
-    #             return md5temp
-    #     return False
+    def send_record(self, event_title, event_url, event_id):
+        """
+        调用邮件发送函数并记录被发送的事件ID
+        没有返回值
+        函数内调用sendTextEmail()
+        :param event_id:
+        :param event_url:
+        :param event_title:
+        """
+        check_result = self.events_id_check(event_id, self.events_id_list)
+        if 0 not in check_result:
+            try:
+                self.send_text_email(event_title, event_url, 'securityInfo')
+            except Exception as e:
+                error_text = exception_format(get_current_function_name(), e)
+                print error_text
+                # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
+            else:
+                self.events_id_list.append(event_id)
+                self.events_id_add(event_id)
+        else:
+            print event_title, " Same thing was sent,did not send same mail to everyone"
+
 
 if __name__ == '__main__':
     test = FileHandle('filehandle', 'KeyWords.txt', '../Events/EventsID360.txt')
