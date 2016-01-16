@@ -4,6 +4,8 @@ import os
 import json
 import logging
 import hashlib
+import requests
+import time
 import mail
 from common import *
 
@@ -19,6 +21,46 @@ class FileHandle(mail.MailCreate):
         super(FileHandle, self).__init__(sender_name)
         self.key_file = keys_file
         self.events_Id_file = events_id_file
+
+    def data_request(self):
+        """
+        获取最新的10页事件
+        返回一个存储网页的list
+        """
+        print 'dataRequest'
+        urls = []
+        htmls = []
+        for num in range(1, 11):
+            urls.append(self.url + '/page/%s' % num)
+        for url in urls:
+            while True:
+                try:
+                    page = requests.get(url, timeout=30,  verify=True)
+                except requests.exceptions.ConnectTimeout:
+                    time.sleep(60)
+                    continue
+                except requests.exceptions.ConnectionError:
+                    time.sleep(30)
+                    continue
+                except requests.exceptions.HTTPError as e:
+                    error_text = exception_format(get_current_function_name(), e)
+                    self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
+                    time.sleep(600)
+                    continue
+                except Exception as e:
+                    error_text = exception_format(get_current_function_name(), e)
+                    self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+                    continue
+                else:
+                    if page.status_code == 200:
+                        htmls.append(page.content)  # get page content
+                        # time.sleep(random.randint(0,60))
+                        break
+                    else:
+                        error_text = "Page Code %s " % page.status_code
+                        self.send_text_email('Page Error', error_text, 'ExceptionInfo')
+                        continue
+        return htmls
 
     def events_id_read(self):
         """
