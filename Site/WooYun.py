@@ -19,7 +19,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
     """docstring for WooYun"""
 
     def __init__(self, keys_file, events_id_file):
-        super(WooYun, self).__init__('WooYun监看机器人', keys_file, events_id_file)
+        super(WooYun, self).__init__('启明WooYun监看机器人', keys_file, events_id_file)
         self.wooyun_url = 'http://api.wooyun.org/bugs/submit'
         self.events_id_list = self.events_id_read()
         self.key_words_list = self.key_words_read
@@ -38,7 +38,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
             'Connection': 'keep-alive'
         }
-        # self.con = database.connect_wooyun()
+        self.con = database.connect_wooyun()
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
@@ -172,7 +172,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         try:
             for detail in data:
                 title = detail.get('title').lower()
-                #print title
+                # print title
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in title:
                         if values:
@@ -208,39 +208,17 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                              detail.get('link'),
                                              detail.get('id'))
                     else:
-                        print "事件中不存在监看关键词,开始检测下一个关键词"
+                        print "事件中不存在监看关键词『",key1,"』开始检测下一关键词"
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             print error_text
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
 
-    def send_record(self, event_title, event_url, event_id):
-        """
-        调用邮件发送函数并记录被发送的事件ID
-        没有返回值
-        函数内调用sendTextEmail()
-        :param event_id:
-        :param event_url:
-        :param event_title:
-        """
-        print 'WooYun_sendRecord'
-        check_result = self.events_id_check(event_id, self.events_id_list)
-        if 0 not in check_result:
-            try:
-                self.send_text_email(event_title, event_url, 'securityInfo')
-            except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
-                print error_text
-                # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
-            else:
-                self.events_id_list.append(event_id)
-                self.events_id_add(event_id)
-        else:
-            print event_title, " Same thing was sent,did not send same mail to everyone"
 
 
 if __name__ == '__main__':
     robot_WooYun = WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
+    # robot_WooYun.data_request()
     # robot_WooYun.data_achieve(robot_WooYun.data_request())
     robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.data_request()))
     # dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')

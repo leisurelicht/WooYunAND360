@@ -1,8 +1,6 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
-import requests
 import re
-import time
 import logging
 from bs4 import BeautifulSoup
 from Common import mail, filehandle
@@ -16,8 +14,8 @@ logging.basicConfig()
 class FixSky(filehandle.FileHandle, mail.MailCreate):
     """docstring for fix360"""
     def __init__(self, keys_file, events_id_file):
-        super(FixSky, self).__init__('360补天监看机器人', keys_file, events_id_file)
-        self._360fix_url = 'http://loudong.360.cn/vul/list'
+        super(FixSky, self).__init__('启明360补天监看机器人', keys_file, events_id_file)
+        self.url = 'http://loudong.360.cn/vul/list'
         self._360base_url = 'http://loudong.360.cn'
         self.events_id_list = self.events_id_read()
         self.key_words_list = self.key_words_read
@@ -25,48 +23,50 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         self.html = 0
         self.count = 0
 
+        #self.con = database.connect_fixsky()
+
     def __del__(self):
         print '360监看机器人 is shutdown'
 
-    def data_request(self):
-        """
-        从360补天获取最新的10页事件
-        返回一个存储网页的list
-        """
-        print '360_dataRequest'
-        urls = []
-        htmls = []
-        for num in range(1, 11):
-            urls.append(self._360fix_url + '/page/%s' % num)
-        for url in urls:
-            while True:
-                try:
-                    page = requests.get(url, timeout=30)
-                except requests.exceptions.ConnectTimeout:
-                    time.sleep(60)
-                    continue
-                except requests.exceptions.ConnectionError:
-                    time.sleep(30)
-                    continue
-                except requests.exceptions.HTTPError as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
-                    time.sleep(600)
-                    continue
-                except Exception as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-                    continue
-                else:
-                    if page.status_code == 200:
-                        htmls.append(page.content)  # get page content
-                        # time.sleep(random.randint(0,60))
-                        break
-                    else:
-                        error_text = "Page Code %s " % page.status_code
-                        self.send_text_email('Page Error', error_text, 'ExceptionInfo')
-                        continue
-        return htmls
+    # def data_request(self):
+    #     """
+    #     从360补天获取最新的10页事件
+    #     返回一个存储网页的list
+    #     """
+    #     print '360_dataRequest'
+    #     urls = []
+    #     htmls = []
+    #     for num in range(1, 11):
+    #         urls.append(self._360fix_url + '/page/%s' % num)
+    #     for url in urls:
+    #         while True:
+    #             try:
+    #                 page = requests.get(url, timeout=30)
+    #             except requests.exceptions.ConnectTimeout:
+    #                 time.sleep(60)
+    #                 continue
+    #             except requests.exceptions.ConnectionError:
+    #                 time.sleep(30)
+    #                 continue
+    #             except requests.exceptions.HTTPError as e:
+    #                 error_text = exception_format(get_current_function_name(), e)
+    #                 self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
+    #                 time.sleep(600)
+    #                 continue
+    #             except Exception as e:
+    #                 error_text = exception_format(get_current_function_name(), e)
+    #                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+    #                 continue
+    #             else:
+    #                 if page.status_code == 200:
+    #                     htmls.append(page.content)  # get page content
+    #                     # time.sleep(random.randint(0,60))
+    #                     break
+    #                 else:
+    #                     error_text = "Page Code %s " % page.status_code
+    #                     self.send_text_email('Page Error', error_text, 'ExceptionInfo')
+    #                     continue
+    #     return htmls
 
     def data_achieve(self, pages):
         """
@@ -107,13 +107,13 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         try:
             for (_360url, _360title) in events.iteritems():
                 _360title = _360title.lower()
-                # print _360title
+                print _360title
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in _360title:
                         if values:
                             for value in values:
                                 # 1. 检查第二关键字是否存在
-                                if value.get('KEY2') is not None:
+                                if value.get('KEY2'):
                                     if value.get('KEY2') in _360title:
                                         # print '1.',_360title
                                         self.send_record(_360title,
@@ -135,31 +135,6 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-
-    def send_record(self, event_title, event_url, event_id):
-        """
-        调用邮件发送函数并记录被发送的事件ID
-        没有返回值
-        函数内调用sendTextEmail()
-        :param event_id:
-        :param event_url:
-        :param event_title:
-        """
-        print '360_sendRecord'
-        check_result = self.events_id_check(event_id, self.events_id_list)
-        if 0 not in check_result:
-            try:
-                # pass #test to use
-                self.send_text_email(event_title, event_url, 'securityInfo')
-            except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
-                print error_text
-                # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
-            else:
-                self.events_id_list.append(event_id)
-                self.events_id_add(event_id)
-        else:
-            print event_title, " Same thing was sent,did not send same mail to everyone"
 
 
 if __name__ == '__main__':
