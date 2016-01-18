@@ -23,6 +23,23 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         self.html = 0
         self.count = 0
 
+        self.headers = {
+            'Host': 'loudong.360.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+            'Accept-Encoding': 'gzip, deflate',
+            'DNT': '1',
+            'Referer': 'http://loudong.360.cn/vul/list',
+            'Cookie': 'pgv_pvi=6038021120; PHPSESSID=6d947f3863a63879a26bd9bcf9d6804e; \
+            CNZZDATA1254945139=1429258137-1453105216-%7C1453105216; IESESSION=alive; \
+            tencentSig=1869615104; pgv_si=s9109886976; __guid=90162694.2437595648188995600.1453105662014.9954; \
+            Q=u%3D%25P4%25ON%25O3%25OS_001%26n%3D%25P4%25ON%25P1%25R3%25PP%25RP%25O3%25OS%26le%3DZmLlBQL0AGHjWGDjpKRhL29g%26m%3D%26qid%3D101635689%26im%3D1_t01e12f28b905f7e221%26src%3Dpcw_webscan%26t%3D1; \
+            T=s%3D4dc5ac3aa810648d687e84144622f1be%26t%3D1453105664%26lm%3D%26lf%3D1%26sk%3D2cbe34b8bcf6ae343f239584234e7b61%26mt%3D1453105664%26rc%3D%26v%3D2.0%26a%3D1',
+            'Connection': 'keep-alive',
+            'Cache-Control': 'max-age=0'
+        }
+
         #self.con = database.connect_fixsky()
 
     def __del__(self):
@@ -53,6 +70,42 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         # database.remove_date(self.con)
         # database.insert_data(self.con, data)
         return events
+
+    def domain_description_achieve(self, url):
+        """
+        获取WooYun事件页面中的描述部分和厂商域名
+        :param url: wooyun漏洞页面
+        :return: （domain,description）domain可能为None, description可能为''
+        """
+        print 'WooYun_domain_description_achieve'
+        page = self.request(url=url, header=self.headers).content
+        try:
+            soup = BeautifulSoup(page, "html5lib")
+        except Exception as e:
+            error_text = exception_format(get_current_function_name(), e)
+            print error_text
+            # self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+        else:
+            des = soup.find(id="ld_td_description").string  # 获取描述
+            dom_exi = soup.find(class_="ld-vul-v1-tips").string
+            if u'已注册' in dom_exi:
+                print soup.find('a', href="/vul/search/c/")
+                #page = self.request(url)
+
+            # if url2:
+            #     page = self.data_request(url=url2, header=self.headers).content
+            #     if page:
+            #         raw_domain = etree.HTML(page)
+            #         if u"厂商信息" in unicode(raw_domain.xpath('/html/head/title/text()')[0]):
+            #             domain = get_tld(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
+            #             return domain, des
+            #         else:
+            #         # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
+            #             return None, des
+            #     else:
+            #         return None, des
+            # else:
+            #     return None, des
 
     def key_words_check(self, events):
         """
@@ -101,4 +154,6 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot = FixSky('../Config/keyWords.txt', '../Events/EventsID360.txt')
-    robot.key_words_check(robot.data_achieve(robot.data_request()))
+    # robot.key_words_check(robot.data_achieve(robot.data_request()))
+    # robot.domain_description_achieve('http://loudong.360.cn/vul/info/qid/QTVA-2016-366149')
+    robot.domain_description_achieve('http://loudong.360.cn/vul/info/qid/QTVA-2016-365585')
