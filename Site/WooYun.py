@@ -38,7 +38,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
             'Connection': 'keep-alive'
         }
-        self.con = database.connect_wooyun()
+        # self.con = database.connect_wooyun()
 
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
@@ -145,12 +145,11 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 page = self.data_request(url=url2, header=self.headers).content
                 if page:
                     raw_domain = etree.HTML(page)
-                    # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
-                    #    return (None, des)
                     if u"厂商信息" in unicode(raw_domain.xpath('/html/head/title/text()')[0]):
                         domain = get_tld(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
                         return domain, des
                     else:
+                    # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
                         return None, des
                 else:
                     return None, des
