@@ -2,6 +2,7 @@
 # -*- coding=utf-8 -*-
 import re
 import logging
+from lxml import etree
 from bs4 import BeautifulSoup
 from Common import mail, filehandle
 from Common.common import *
@@ -89,8 +90,12 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             des = soup.find(id="ld_td_description").string  # 获取描述
             dom_exi = soup.find(class_="ld-vul-v1-tips").string
             if u'已注册' in dom_exi:
-                print soup.find('a', href="/vul/search/c/")
-                #page = self.request(url)
+                url2 = soup.find(href=re.compile(u'/vul/search/c/'))['href']
+                dom_page = self.request(self._360base_url+url2, self.headers)
+                raw_dom = etree.HTML(dom_page.content)
+                print raw_dom.xpath('/html/head/title')[0]
+                print raw_dom.xpath('/html/body/div[2]/div/div/div[1]/div[2]/table/tbody/tr[1]/td[1]')
+
 
             # if url2:
             #     page = self.data_request(url=url2, header=self.headers).content
