@@ -31,7 +31,8 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-            'Accept-Encoding': 'gzip, deflate', 'DNT': '1',
+            'Accept-Encoding': 'gzip, deflate',
+            'DNT': '1',
             'Referer': 'http://www.wooyun.org/index.php',
             'Cookie': 'Hm_lvt_c12f88b5c1cd041a732dea597a5ec94c=1443363836,1443364000,1443364038,1444381968; bdshare_firstime=1423619234389; \
             __cfduid=d037debb012835d005205cd496bcdaf321437360051; PHPSESSID=un87r2ohvbnilkehpp5ckkgcd5; \
@@ -58,7 +59,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     self.send_text_email('Important Program Exception', 'Target url can not reach', 'ExceptionInfo')
                     self.count = 0
                     time.sleep(100)
-                    continue
+                    continue # 怎么能结束这一次查询呢
                 page = requests.get(url, timeout=30, headers=header)
             except socket.timeout:
                 time.sleep(30)
@@ -99,6 +100,10 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     continue
                 elif page.status_code == 504:
                     time.sleep(30)
+                    self.count += 1
+                    continue
+                elif page.status_code == 503:
+                    time.sleep(300)
                     self.count += 1
                     continue
                 else:
