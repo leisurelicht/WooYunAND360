@@ -44,7 +44,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
     def __del__(self):
         print 'WooYun监看机器人 is shutdown'
 
-    def data_request(self, url=None, header=None):
+    def api_request(self, url=None, header=None):
         """
         从乌云API获取json格式的数据
         返回json格式的数据
@@ -58,8 +58,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 if self.count > 10:
                     self.send_text_email('Important Program Exception', 'Target url can not reach', 'ExceptionInfo')
                     self.count = 0
-                    time.sleep(100)
-                    continue # 怎么能结束这一次查询呢
+                    return None
                 page = requests.get(url, timeout=30, headers=header)
             except socket.timeout:
                 time.sleep(30)
@@ -103,12 +102,16 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     self.count += 1
                     continue
                 elif page.status_code == 503:
-                    time.sleep(300)
+                    if page.headers.get('Retry-After'):
+                        time.sleep(int(page.headers.get('Retry-After')))
+                    else:
+                        pass
                     self.count += 1
                     continue
                 else:
                     error_text = "Page Code %s " % page.status_code
                     self.send_text_email('Page Error', error_text, 'ExceptionInfo')
+                    self.count += 1
                     continue
 
     def data_achieve(self, text):
@@ -123,7 +126,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-                text = self.data_request()
+                text = self.api_request()
             else:
                 # database.remove_date(self.con)
                 # database.insert_data(self.con, data)
@@ -136,7 +139,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         :return: （domain,description）domain可能为None, description可能为''
         """
         print 'WooYun_domain_description_achieve'
-        page = self.data_request(url=url, header=self.headers).content
+        page = self.api_request(url=url, header=self.headers).content
         try:
             soup = BeautifulSoup(page, "html5lib")
         except Exception as e:
@@ -147,12 +150,12 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             des = soup.find(class_="detail wybug_description").string  # 获取描述
             url2 = soup.find('h3', class_="wybug_corp").a['href']
             if url2:
-                page = self.data_request(url=url2, header=self.headers).content
+                page = self.api_request(url=url2, header=self.headers).content
                 if page:
                     raw_domain = etree.HTML(page)
                     if u"厂商信息" in unicode(raw_domain.xpath('/html/head/title/text()')[0]):
-                        domain = get_tld(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
-                        return domain, des
+                        domain = self.get_domain(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
+                        return domain, des  # 域名, 描述
                     else:
                     # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
                         return None, des
@@ -222,9 +225,10 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot_WooYun = WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
-    # robot_WooYun.data_request()
-    # robot_WooYun.data_achieve(robot_WooYun.data_request())
-    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.data_request()))
+    tmp = robot_WooYun.api_request()
+    print tmp.headers.get('Set-Cookie')
+    # robot_WooYun.data_achieve(robot_WooYun.api_request())
+    # robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
     # dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')
     # print dom
     # print des

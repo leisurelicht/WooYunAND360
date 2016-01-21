@@ -27,7 +27,7 @@ def run_360():
     """
     调用fix360.py中的功能函数
     """
-    robot_360.key_words_check(robot_360.data_achieve(robot_360.data_request()))
+    robot_360.key_words_check(robot_360.data_achieve(robot_360.api_request()))
 
 
 @robot_start_sign("WooYun爬虫机器人")
@@ -35,7 +35,11 @@ def run_wooyun():
     """
     调用WooYun.py中的功能函数
     """
-    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.data_request()))
+    data = robot_WooYun.api_request()
+    if data:
+        robot_WooYun.key_words_check(robot_WooYun.data_achieve(data))
+    else:
+        pass
 
 
 @robot_start_sign("漏洞盒子爬虫机器人")
@@ -43,7 +47,7 @@ def run_freebuf():
     """
     调用freebuf.py中的功能函数
     """
-    robot_FreeBuf.key_words_check(robot_FreeBuf.data_achieve(robot_FreeBuf.data_request()))
+    robot_FreeBuf.key_words_check(robot_FreeBuf.data_achieve(robot_FreeBuf.api_request()))
 
 
 @robot_start_sign("启动报告机器人")
