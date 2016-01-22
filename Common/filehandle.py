@@ -1,12 +1,15 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
+
 import os
+import sys
 import json
 import logging
 import hashlib
 import requests
 import time
 import mail
+from tld import get_tld
 from common import *
 
 reload(sys)
@@ -24,45 +27,71 @@ class FileHandle(mail.MailCreate):
         self.url = None  # 在上层初始化
         self.events_id_list = []  # 在上层初始化
 
-    def data_request(self):
+    def page_request(self):
         """
         获取最新的10页事件
         返回一个存储网页的list
         """
-        print 'dataRequest'
+        print 'data_Request'
         urls = []
         htmls = []
         for num in range(1, 11):
             urls.append(self.url + '/page/%s' % num)
         for url in urls:
-            while True:
-                try:
-                    page = requests.get(url, timeout=30,  verify=True)
-                except requests.exceptions.ConnectTimeout:
-                    time.sleep(60)
-                    continue
-                except requests.exceptions.ConnectionError:
-                    time.sleep(30)
-                    continue
-                except requests.exceptions.HTTPError as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
-                    time.sleep(600)
-                    continue
-                except Exception as e:
-                    error_text = exception_format(get_current_function_name(), e)
-                    self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-                    continue
-                else:
-                    if page.status_code == 200:
-                        htmls.append(page.content)  # get page content
-                        # time.sleep(random.randint(0,60))
-                        break
-                    else:
-                        error_text = "Page Code %s " % page.status_code
-                        self.send_text_email('Page Error', error_text, 'ExceptionInfo')
-                        continue
+            htmls.append(self.request(url).content)
         return htmls
+
+    def request(self, url, header=None):
+        """
+
+        :return:
+        """
+        print 'request'
+        count = 0
+        while True:
+            try:
+                if count > 3:
+                    return None
+                page = requests.get(url=url, headers=header, timeout=30,  verify=True)
+            except requests.exceptions.ConnectTimeout:
+                time.sleep(60)
+                count += 1
+                continue
+            except requests.exceptions.ConnectionError:
+                time.sleep(30)
+                count += 1
+                continue
+            except requests.exceptions.HTTPError as e:
+                error_text = exception_format(get_current_function_name(), e)
+                count += 1
+                self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
+                time.sleep(600)
+                continue
+            except Exception as e:
+                error_text = exception_format(get_current_function_name(), e)
+                count += 1
+                print error_text
+                self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+                continue
+            else:
+                if page.status_code == 200:
+                    return page  # get page
+                    # time.sleep(random.randint(0,60))
+                else:
+                    error_text = "Page Code %s " % page.status_code
+                    count += 1
+                    self.send_text_email('Page Error', error_text, 'ExceptionInfo')
+                    continue
+
+    def get_domain(self, url):
+        """
+        获取域名
+        :param url:
+        :return:
+        """
+        print "domain_get"
+        return get_tld(url)
+
 
     def events_id_read(self):
         """

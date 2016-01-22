@@ -97,4 +97,4 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
 if __name__ == '__main__':
 
     robot = FreeBuf('../Config/keyWords.txt', '../Events/EventsIDfreebuf.txt')
-    robot.key_words_check(robot.data_achieve(robot.data_request()))
+    robot.key_words_check(robot.data_achieve(robot.page_request()))

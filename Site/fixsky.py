@@ -2,9 +2,8 @@
 # -*- coding=utf-8 -*-
 import re
 import logging
-from lxml import etree
 from bs4 import BeautifulSoup
-from Common import mail, filehandle
+from Common import mail, filehandle, database
 from Common.common import *
 
 reload(sys)
@@ -33,15 +32,18 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             'DNT': '1',
             'Referer': 'http://loudong.360.cn/vul/list',
             'Cookie': 'pgv_pvi=6038021120; PHPSESSID=6d947f3863a63879a26bd9bcf9d6804e; \
-            CNZZDATA1254945139=1429258137-1453105216-%7C1453105216; IESESSION=alive; \
-            tencentSig=1869615104; pgv_si=s9109886976; __guid=90162694.2437595648188995600.1453105662014.9954; \
+            CNZZDATA1254945139=1429258137-1453105216-%7C1453105216; \
+            IESESSION=alive; \
+            tencentSig=1869615104; \
+            pgv_si=s9109886976; \
+            __guid=90162694.2437595648188995600.1453105662014.9954; \
             Q=u%3D%25P4%25ON%25O3%25OS_001%26n%3D%25P4%25ON%25P1%25R3%25PP%25RP%25O3%25OS%26le%3DZmLlBQL0AGHjWGDjpKRhL29g%26m%3D%26qid%3D101635689%26im%3D1_t01e12f28b905f7e221%26src%3Dpcw_webscan%26t%3D1; \
             T=s%3D4dc5ac3aa810648d687e84144622f1be%26t%3D1453105664%26lm%3D%26lf%3D1%26sk%3D2cbe34b8bcf6ae343f239584234e7b61%26mt%3D1453105664%26rc%3D%26v%3D2.0%26a%3D1',
             'Connection': 'keep-alive',
             'Cache-Control': 'max-age=0'
         }
 
-        #self.con = database.connect_fixsky()
+        # self.con = database.connect_fixsky()
 
     def __del__(self):
         print '360监看机器人 is shutdown'
@@ -54,6 +56,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         """
         print '360_dataAchieve'
         events = {}
+        data = []
         for page in pages:
             try:
                 soup = BeautifulSoup(page, "html5lib")
@@ -66,11 +69,13 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 # title3 = soup.find_all(href=re.compile("/vul/search/"))
                 # titles = title1 + title2 +title3
                 for title in titles:
-                    events[title['href']] = title.string.strip()
+                    events['link'] = title['href']
+                    events['title'] = title.string.strip()
+                    data.append(events.copy())
                     break
         # database.remove_date(self.con)
         # database.insert_data(self.con, data)
-        return events
+        return data
 
     def domain_description_achieve(self, url):
         """
@@ -79,45 +84,36 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         :return: （domain,description）domain可能为None, description可能为''
         """
         print 'WooYun_domain_description_achieve'
-        page = self.request(url=url, header=self.headers).content
+        page = self.request(url=url, header=self.headers)
+        if page:
+            page = page.content
         try:
             soup = BeautifulSoup(page, "html5lib")
-        except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
-            print error_text
-            # self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-        else:
             des = soup.find(id="ld_td_description").string  # 获取描述
             dom_exi = soup.find(class_="ld-vul-v1-tips").string
             if u'已注册' in dom_exi:
                 url2 = soup.find(href=re.compile(u'/vul/search/c/'))['href']
                 dom_page = self.request(self._360base_url+url2, self.headers)
-                raw_dom = etree.HTML(dom_page.content)
-                print raw_dom.xpath('/html/head/title')[0]
-                print raw_dom.xpath('/html/body/div[2]/div/div/div[1]/div[2]/table/tbody/tr[1]/td[1]')
+                if dom_page:
+                    raw_dom = BeautifulSoup(dom_page.content, "html5lib")
+                    domain = raw_dom.find(class_='company_info').table.tbody.tr.td.next_sibling.next_sibling.string
+                    return domain, des
+                else:
+                    return None, des
+            else:
+                return None, des
+        except Exception as e:
+            error_text = exception_format(get_current_function_name(), e)
+            print error_text
+            self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
+            return None, None
 
-
-            # if url2:
-            #     page = self.data_request(url=url2, header=self.headers).content
-            #     if page:
-            #         raw_domain = etree.HTML(page)
-            #         if u"厂商信息" in unicode(raw_domain.xpath('/html/head/title/text()')[0]):
-            #             domain = get_tld(''.join(list(raw_domain.xpath('/html/body/div[5]/h3[1]/text()')[0])[3:]))
-            #             return domain, des
-            #         else:
-            #         # if '厂商' in sign and '不存在' in sign and '未通过审核' in sign:
-            #             return None, des
-            #     else:
-            #         return None, des
-            # else:
-            #     return None, des
-
-    def key_words_check(self, events):
+    def key_words_check(self, data):
         """
         检查获得的标题中是否含有要监看的关键字
         函数内调用sendRecord()
         没有返回值
-        :param events:
+        :param data:
         """
         print '360_key_words_check'
         md5value = self.file_md5_get
@@ -125,33 +121,40 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             self.key_words_list = self.key_words_read
             self.fileMd5 = md5value
         try:
-            for (_360url, _360title) in events.iteritems():
-                _360title = _360title.lower()
-                print _360title
+            for detail in data:
+                title = detail.get('title').lower()
+                print title
                 for key1, values in self.key_words_list.iteritems():
-                    if key1 in _360title:
+                    if key1 in title:
                         if values:
                             for value in values:
-                                # 1. 检查第二关键字是否存在
+                                dom, des = self.domain_description_achieve(self._360base_url+detail.get('link'))
                                 if value.get('KEY2'):
-                                    if value.get('KEY2') in _360title:
+                                    # 1. 检查第二关键字是否存在标题中
+                                    if value.get('KEY2') in title:
                                         # print '1.',_360title
-                                        self.send_record(_360title,
-                                                         self._360base_url + _360url,
-                                                         _360url.split('/')[-1])
-                                    # else: #二级关键词不中的话继续查域名和内容
-                                        # 2. 进入页面检查厂商域名
-                                        # 3. 在页面内查找是否存在第二关键字
-                                elif value.get('KEY2') is None:
+                                        self.send_record(detail.get('title'),
+                                                         self._360base_url + detail.get('link'),
+                                                         detail.get('link').split('/')[-1])
+                                    # 1. 检查第二关键字是否存在描述中
+                                    elif des and (value.get('KEY2') in des):
+                                        self.send_record(detail.get('title'),
+                                                         self._360base_url + detail.get('link'),
+                                                         detail.get('link').split('/')[-1])
+                                elif value.get('URL') and dom and (value.get('URL') in dom):
                                     # print '3.',_360title
-                                    self.send_record(_360title,
-                                                     self._360base_url + _360url,
-                                                     _360url.split('/')[-1])
+                                    self.send_record(detail.get('title'),
+                                                     self._360base_url + detail.get('link'),
+                                                     detail.get('link').split('/')[-1])
+                                else:
+                                    continue
                         else:
                             # print '2.',_360title
-                            self.send_record(_360title,
-                                             self._360base_url + _360url,
-                                             _360url.split('/')[-1])
+                            self.send_record(detail.get('title'),
+                                             self._360base_url + detail.get('link'),
+                                             detail.get('link').split('/')[-1])
+                    else:
+                        print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
@@ -159,6 +162,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
 
 if __name__ == '__main__':
     robot = FixSky('../Config/keyWords.txt', '../Events/EventsID360.txt')
-    # robot.key_words_check(robot.data_achieve(robot.data_request()))
+    # print robot.data_achieve(robot.page_request())
+    robot.key_words_check(robot.data_achieve(robot.page_request()))
     # robot.domain_description_achieve('http://loudong.360.cn/vul/info/qid/QTVA-2016-366149')
-    robot.domain_description_achieve('http://loudong.360.cn/vul/info/qid/QTVA-2016-365585')
+    # robot.domain_description_achieve('http://loudong.360.cn/vul/info/qid/QTVA-2016-367457')
