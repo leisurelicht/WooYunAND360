@@ -35,6 +35,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         """
         print 'freebuf_dataAchieve'
         events = {}
+        data = []
         for page in pages:
             try:
                 soup = BeautifulSoup(page, "html5lib")
@@ -42,13 +43,18 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                 error_text = exception_format(get_current_function_name(), e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
             else:
-                titles = soup.find_all(href=re.compile("/bugs/vulbox"), target="_blank")
+                #titles = soup.find_all('a',href=re.compile("/bugs/vulbox"), target="_blank")
+                titles = soup.find_all('h4',class_='tit')
                 for title in titles:
-                    events[title['href']] = title.string.strip()
-                break
+                    events['link'] = title.a['href']
+                    events['title'] = title.a.string.strip()
+                    data.append(events.copy())
+                continue
         # database.remove_date(self.con)
         # database.insert_data(self.con, data)
-        return events
+        for i in data:
+            print i.get('title')
+        return data
 
     def key_words_check(self, events):
         """
@@ -63,32 +69,31 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
             self.key_words_list = self.key_words_read
             self.fileMd5 = md5value
         try:
-            for (freebuf_url, freebuf_title) in events.iteritems():
-                freebuf_title = freebuf_title.lower()
-                # print freebuf_title
+            for detail in events:
+                title = detail.get('title').lower()
+                # print title
+                # print detail.get('link')
                 for key1, values in self.key_words_list.iteritems():
-                    if key1 in freebuf_title:
+                    if key1 in title:
                         if values:
                             for value in values:
                                 if value.get('KEY2') is not None:
-                                    if value.get('KEY2') in freebuf_title:
-                                        # print '1',freebuf_title
-                                        self.send_record(freebuf_title,
-                                                         self.freebuf_base_url+freebuf_url,
-                                                         freebuf_url.split('/')[-1])
+                                    if value.get('KEY2') in title:
+                                        self.send_record(detail.get('title'),
+                                                         self.freebuf_base_url + detail.get('link'),
+                                                         detail.get('link').split('/')[-1])
                                     # else: #二级关键词不中的话继续查域名和内容
                                         # 2. 进入页面检查厂商域名
                                         # 3. 在页面内查找是否存在第二关键字
+                                        # 页面不是很规律,有点麻烦啊
                                 elif value.get('KEY2') is None:
-                                    # print '3',freebuf_title
-                                    self.send_record(freebuf_title,
-                                                     self.freebuf_base_url + freebuf_url,
-                                                     freebuf_url.split('/')[-1])
+                                    self.send_record(detail.get('title'),
+                                                     self.freebuf_base_url + detail.get('link'),
+                                                     detail.get('link').split('/')[-1])
                         else:
-                            # print '2',freebuf_title
-                            self.send_record(freebuf_title,
-                                             self.freebuf_base_url+freebuf_url,
-                                             freebuf_url.split('/')[-1])
+                            self.send_record(detail.get('title'),
+                                             self.freebuf_base_url + detail.get('link'),
+                                             detail.get('link').split('/')[-1])
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
@@ -97,4 +102,5 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
 if __name__ == '__main__':
 
     robot = FreeBuf('../Config/keyWords.txt', '../Events/EventsIDfreebuf.txt')
-    robot.key_words_check(robot.data_achieve(robot.page_request()))
+    robot.data_achieve(robot.page_request())
+    # robot.key_words_check(robot.data_achieve(robot.page_request()))

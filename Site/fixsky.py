@@ -72,7 +72,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                     events['link'] = title['href']
                     events['title'] = title.string.strip()
                     data.append(events.copy())
-                    break
+                continue
         # database.remove_date(self.con)
         # database.insert_data(self.con, data)
         return data
