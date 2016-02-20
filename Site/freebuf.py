@@ -52,8 +52,6 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                 continue
         # database.remove_date(self.con)
         # database.insert_data(self.con, data)
-        for i in data:
-            print i.get('title')
         return data
 
     def key_words_check(self, events):
@@ -71,8 +69,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         try:
             for detail in events:
                 title = detail.get('title').lower()
-                # print title
-                # print detail.get('link')
+                print title
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in title:
                         if values:
@@ -85,15 +82,18 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                                     # else: #二级关键词不中的话继续查域名和内容
                                         # 2. 进入页面检查厂商域名
                                         # 3. 在页面内查找是否存在第二关键字
-                                        # 页面不是很规律,有点麻烦啊
+                                        # 页面不是很规律,有点麻烦
                                 elif value.get('KEY2') is None:
                                     self.send_record(detail.get('title'),
                                                      self.freebuf_base_url + detail.get('link'),
                                                      detail.get('link').split('/')[-1])
                         else:
-                            self.send_record(detail.get('title'),
+                            self.send_record(detail.get(
+                                    'title'),
                                              self.freebuf_base_url + detail.get('link'),
                                              detail.get('link').split('/')[-1])
+                    else:
+                        print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
@@ -103,4 +103,4 @@ if __name__ == '__main__':
 
     robot = FreeBuf('../Config/keyWords.txt', '../Events/EventsIDfreebuf.txt')
     robot.data_achieve(robot.page_request())
-    # robot.key_words_check(robot.data_achieve(robot.page_request()))
+    robot.key_words_check(robot.data_achieve(robot.page_request()))
