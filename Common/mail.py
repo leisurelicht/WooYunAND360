@@ -81,7 +81,17 @@ class MailCreate(object):
             error_text = exception_format(get_current_function_name(), e)
             print error_text
 
-    def send_text_email(self, title, message, message_type):
+    def receiver_get(self,tag):
+        #select username, mailaddress from USERS where tag in tag;
+        pass
+
+    def send_warn_email(self, title, message, message_type):
+        pass
+
+    def send_vulnerability_email(self,title, url, tag):
+        pass
+
+    def send_text_email(self, title, message, message_type):  #tag
         """
         发送文本邮件
         没有返回值
