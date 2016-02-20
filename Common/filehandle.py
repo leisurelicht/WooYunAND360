@@ -2,13 +2,13 @@
 # -*- coding=utf-8 -*-
 
 import os
-import sys
 import json
 import logging
 import hashlib
 import requests
 import time
 import mail
+import random
 from tld import get_tld
 from common import *
 
@@ -27,23 +27,11 @@ class FileHandle(mail.MailCreate):
         self.url = None  # 在上层初始化
         self.events_id_list = []  # 在上层初始化
 
-    def page_request(self):
-        """
-        获取最新的10页事件
-        返回一个存储网页的list
-        """
-        print 'data_Request'
-        urls = []
-        htmls = []
-        for num in range(1, 11):
-            urls.append(self.url + '/page/%s' % num)
-        for url in urls:
-            htmls.append(self.request(url).content)
-        return htmls
-
     def request(self, url, header=None):
         """
 
+        :param header:
+        :param url:
         :return:
         """
         print 'request'
@@ -83,7 +71,23 @@ class FileHandle(mail.MailCreate):
                     self.send_text_email('Page Error', error_text, 'ExceptionInfo')
                     continue
 
-    def get_domain(self, url):
+    def page_request(self):
+        """
+        获取最新的10页事件
+        返回一个存储网页的list
+        """
+        print 'data_Request'
+        urls = []
+        htmls = []
+        for num in range(1, 11):
+            urls.append(self.url + '/page/%s' % num)
+        for url in urls:
+            htmls.append(self.request(url).content)
+            time.sleep(random.randint(1,5))
+        return htmls
+
+    @staticmethod
+    def get_domain(url):
         """
         获取域名
         :param url:
@@ -91,7 +95,6 @@ class FileHandle(mail.MailCreate):
         """
         print "domain_get"
         return get_tld(url)
-
 
     def events_id_read(self):
         """
@@ -156,6 +159,7 @@ class FileHandle(mail.MailCreate):
                 error_text = "请检查关键词文件格式是否正确"
                 print error_text
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
+                exit(0)
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
                 print error_text
@@ -185,7 +189,7 @@ class FileHandle(mail.MailCreate):
         else:
             return md5temp
 
-    def send_record(self, event_title, event_url, event_id):
+    def send_record(self, event_title, event_url, event_id):  # tag
         """
         调用邮件发送函数并记录被发送的事件ID
         没有返回值
