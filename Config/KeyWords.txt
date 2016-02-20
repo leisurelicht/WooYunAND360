@@ -3,15 +3,16 @@
     [
         {
             "KEY2":"银华",
-            "URL1":"yufund.com.cn"
+            "URL":"yufund.com.cn",
+            "TAG":1
         },
         {
             "KEY2":"嘉实",
-            "URL1":"jsfund.cn"
+            "URL":"jsfund.cn"
         },
         {
             "KEY2":"长盛",
-            "URL1":"csfunds.com.cn"
+            "URL":"csfunds.com.cn"
         },
         {
             "KEY2":"诺安"
@@ -21,17 +22,22 @@
     [
         {
             "KEY2":"宁夏",
-            "URL1":"bankofnx.com.cn",
-            "URL2":"ycccb.com.cn"
+            "URL":["bankofnx.com.cn","ycccb.com.cn"]
         }
     ],
-    "西安交大":
+    "新浪":
     [
         {
-            "URL1":"tonghuashu.com"
+            "URL":"sina.com.cn"
         }
     ],
-    "车保网":
+    "联通":
+    [
+        {
+            "KEY2":"中国"
+        }
+    ],
+    "搜狗":
     []
 }
 
