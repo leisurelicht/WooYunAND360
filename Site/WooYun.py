@@ -33,9 +33,6 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             'Accept-Encoding': 'gzip, deflate',
             'DNT': '1',
             'Referer': 'http://www.wooyun.org/index.php',
-            'Cookie': 'Hm_lvt_c12f88b5c1cd041a732dea597a5ec94c=1443363836,1443364000,1443364038,1444381968; bdshare_firstime=1423619234389; \
-            __cfduid=d037debb012835d005205cd496bcdaf321437360051; PHPSESSID=un87r2ohvbnilkehpp5ckkgcd5; \
-            Hm_lpvt_c12f88b5c1cd041a732dea597a5ec94c=1444382107',
             'Connection': 'keep-alive'
         }
         # self.con = database.connect_wooyun()
@@ -178,12 +175,12 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         try:
             for detail in data:
                 title = detail.get('title').lower()
-                print detail
+                print title
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in title:
                         if values:
+                            dom, des = self.domain_description_achieve(detail.get('link'))
                             for value in values:
-                                dom, des = self.domain_description_achieve(detail.get('link'))
                                 if value.get('KEY2'):
                                     if value.get('KEY2') in title:
                                         # 1. 在title中继续检查第二关键字是否存在
