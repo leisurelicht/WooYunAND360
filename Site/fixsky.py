@@ -30,15 +30,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
             'Accept-Encoding': 'gzip, deflate',
             'DNT': '1',
-            'Referer': 'http://loudong.360.cn/vul/list',
-            'Cookie': 'pgv_pvi=6038021120; PHPSESSID=6d947f3863a63879a26bd9bcf9d6804e; \
-            CNZZDATA1254945139=1429258137-1453105216-%7C1453105216; \
-            IESESSION=alive; \
-            tencentSig=1869615104; \
-            pgv_si=s9109886976; \
-            __guid=90162694.2437595648188995600.1453105662014.9954; \
-            Q=u%3D%25P4%25ON%25O3%25OS_001%26n%3D%25P4%25ON%25P1%25R3%25PP%25RP%25O3%25OS%26le%3DZmLlBQL0AGHjWGDjpKRhL29g%26m%3D%26qid%3D101635689%26im%3D1_t01e12f28b905f7e221%26src%3Dpcw_webscan%26t%3D1; \
-            T=s%3D4dc5ac3aa810648d687e84144622f1be%26t%3D1453105664%26lm%3D%26lf%3D1%26sk%3D2cbe34b8bcf6ae343f239584234e7b61%26mt%3D1453105664%26rc%3D%26v%3D2.0%26a%3D1',
+            'Cookie': 'tencentSig=7366209536; tencentSig=1638778880; PHPSESSID=c25719d3b3c6aad81592cd67faa78386; IESESSION=alive; CNZZDATA1254945139=1259737161-1455975761-http%253A%252F%252Floudong.360.cn%252F%7C1455981502; __guid=90162694.4484595771534412000.1455981177447.6384; pgv_pvi=4550801408; pgv_si=s3499901952; quCryptCode=Mhl7mCCsuvA%252FTZksdDAzBWN29MvW0Ad5835Wu%252FxXaRtlXDlMUzQv3Q%252FfFXMbGEsuKBix2qiTP%252FI%253D; quCapStyle=2; Q=u%3D%25P4%25ON%25O3%25OS_001%26n%3D%25P4%25ON%25P1%25R3%25PP%25RP%25O3%25OS%26le%3DZmLlBQL0AGHjWGDjpKRhL29g%26m%3D%26qid%3D101635689%26im%3D1_t01e12f28b905f7e221%26src%3Dpcw_webscan%26t%3D1; T=s%3Dd004b8db2a979f1e855714db3d60b72f%26t%3D1455983195%26lm%3D%26lf%3D1%26sk%3D132e01b83a77e9b35ae247d533d4e118%26mt%3D1455983195%26rc%3D%26v%3D2.0%26a%3D1',
             'Connection': 'keep-alive',
             'Cache-Control': 'max-age=0'
         }
@@ -95,9 +87,15 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 url2 = soup.find(href=re.compile(u'/vul/search/c/'))['href']
                 dom_page = self.request(self._360base_url+url2, self.headers)
                 if dom_page:
+                    print 'url:',dom_page.url
                     raw_dom = BeautifulSoup(dom_page.content, "html5lib")
-                    domain = raw_dom.find(class_='company_info').table.tbody.tr.td.next_sibling.next_sibling.string
-                    return domain, des
+                    tmp = raw_dom.find('div',class_='company_info') #360有反机器人机制
+                    if tmp:
+                        domain = tmp.table.tbody.tr.td.next_sibling.next_sibling.string
+                        print 'domain:',domain
+                        return domain, des
+                    else:
+                        return None,des
                 else:
                     return None, des
             else:
@@ -127,8 +125,8 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                 for key1, values in self.key_words_list.iteritems():
                     if key1 in title:
                         if values:
+                            dom, des = self.domain_description_achieve(self._360base_url+detail.get('link'))
                             for value in values:
-                                dom, des = self.domain_description_achieve(self._360base_url+detail.get('link'))
                                 if value.get('KEY2'):
                                     # 1. 检查第二关键字是否存在标题中
                                     if value.get('KEY2') in title:
