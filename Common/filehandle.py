@@ -24,8 +24,8 @@ class FileHandle(mail.MailCreate):
         super(FileHandle, self).__init__(sender_name)
         self.key_file = keys_file
         self.events_Id_file = events_id_file
-        self.url = None  # 在上层初始化
-        self.events_id_list = []  # 在上层初始化
+        self.url = None  # 在子类初始化
+        self.events_id_list = []  # 在子类初始化
 
     def request(self, url, header=None):
         """
