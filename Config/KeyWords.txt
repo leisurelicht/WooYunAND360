@@ -8,37 +8,47 @@
         },
         {
             "KEY2":"嘉实",
-            "URL":"jsfund.cn"
+            "URL":"jsfund.cn",
+            "TAG":2
         },
         {
             "KEY2":"长盛",
-            "URL":"csfunds.com.cn"
+            "URL":"csfunds.com.cn",
+            "TAG":3
         },
         {
-            "KEY2":"诺安"
+            "KEY2":"诺安",
+            "TAG":4
         }
     ],
     "银行":
     [
         {
             "KEY2":"宁夏",
-            "URL":["bankofnx.com.cn","ycccb.com.cn"]
+            "URL":["bankofnx.com.cn","ycccb.com.cn"],
+            "TAG":5
         }
     ],
     "新浪":
     [
         {
-            "URL":"sina.com.cn"
+            "URL":"sina.com.cn",
+            "TAG":6
         }
     ],
     "联通":
     [
         {
-            "KEY2":"中国"
+            "KEY2":"中国",
+            "TAG":6
         }
     ],
-    "搜狗":
-    []
+    "华为":
+    [
+        {
+            "TAG":7
+        }
+    ]
 }
 
 

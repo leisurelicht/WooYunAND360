@@ -1,5 +1,6 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
+import sys
 import time
 import smtplib
 import ConfigParser
@@ -30,13 +31,15 @@ class MailCreate(object):
         self.smtp_server = '0'
         self.smtp_server_port = '0'
         self.sender = '0'
-        self.receiver = '0'
+        self.receiver = []
         self.receiver_admin = '0'
         self.username = '0'
         self.password = '0'
         try:
             self.config = ConfigParser.ConfigParser()
+            self.address = ConfigParser.ConfigParser()
             self.config.read("../Config/mailconfig.ini")
+            self.address.read("../Config/mail_address.ini")
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             print error_text
@@ -57,7 +60,7 @@ class MailCreate(object):
         初始化邮件设置
         返回邮件的参数
         """
-        print "『" + 'mail_init' + "』" + "邮箱初始化开始"
+        print "『" + 'mail_init' + "』\n" + "『邮箱初始化开始』"
         if self.Mail_choose:
             self.Mail = 'MailOne'
         else:
@@ -66,8 +69,8 @@ class MailCreate(object):
             self.smtp_server = self.config.get(self.Mail, 'SmtpServer').strip()
             self.smtp_server_port = self.config.get(self.Mail, "SmtpServer_Port").strip()
             self.sender = self.config.get(self.Mail, "SenderMail")
-            self.receiver = self.config.get(self.Mail, "ReceiverMail").split(',')
-            self.receiver_admin = self.config.get(self.Mail, "ReceiverMail_Admin").split(',')
+            # self.receiver = self.config.get(self.Mail, "ReceiverMail").split(',')
+            self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
             self.username = self.config.get(self.Mail, "MailName").strip()
             self.password = self.config.get(self.Mail, "MailPassword").strip()
         except ConfigParser.NoSectionError:
@@ -80,10 +83,21 @@ class MailCreate(object):
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             print error_text
+        else:
+            print "『邮箱配置成功』"
 
-    def receiver_get(self,tag):
-        #select username, mailaddress from USERS where tag in tag;
-        pass
+    def receiver_get(self,keyword_tag):
+        """
+        根据keyword的tag获取相应的邮箱地址
+        :param keyword_tag:KeyWords最后的TAG
+        :return:
+        """
+
+        address_tag= self.address.items("User_Address")
+        for tmp in address_tag:
+            if str(keyword_tag) in tmp[1].split(','):
+                self.receiver.append(tmp[0])
+
 
     def send_warn_email(self, title, message, message_type):
         pass
@@ -117,6 +131,7 @@ class MailCreate(object):
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
                     msg['To'] = self._format_address(u'Dollars<%s> ' % ','.join(self.receiver))
+                    print msg['To']
                     # 这里有receiver为多个人时无法正确被格式化的问题.
                     # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
@@ -157,7 +172,8 @@ class MailCreate(object):
 
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
-    # test.send_text_email("test",'good',"securityInfo")
+    test.receiver_get(5)
+    test.send_text_email("test",'good',"securityInfo")
     # test.send_text_email("test",'good',"time_report")
 
     # test2 = mail('测试机器人')

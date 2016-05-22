@@ -165,7 +165,9 @@ class FileHandle(mail.MailCreate):
                 print error_text
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             else:
+                # print keywordslist
                 return keywordslist
+
         else:
             print "关键词监看文件不存在"
             tmp = open(self.key_file, 'a')
@@ -189,7 +191,7 @@ class FileHandle(mail.MailCreate):
         else:
             return md5temp
 
-    def send_record(self, event_title, event_url, event_id):  # tag
+    def send_record(self, event_title, event_url, event_id, keyword_tag):  # tag
         """
         调用邮件发送函数并记录被发送的事件ID
         没有返回值
@@ -201,6 +203,7 @@ class FileHandle(mail.MailCreate):
         check_result = self.events_id_check(event_id, self.events_id_list)
         if 0 not in check_result:
             try:
+                self.receiver_get(keyword_tag)
                 self.send_text_email(event_title, event_url, 'securityInfo')
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
@@ -214,7 +217,7 @@ class FileHandle(mail.MailCreate):
 
 
 if __name__ == '__main__':
-    test = FileHandle('filehandle', 'KeyWords.txt', '../Events/EventsID360.txt')
+    test = FileHandle('filehandle', '../Config/KeyWords.txt', '../Events/EventsID360.txt')
     # print test.eventsIdread()
     # for key in test.key_words_read():
     #    print key
@@ -227,4 +230,4 @@ if __name__ == '__main__':
     #    if b:
     #        a = b
     #    time.sleep(5)
-    print test.events_id_read()
+    a=test.key_words_read()
