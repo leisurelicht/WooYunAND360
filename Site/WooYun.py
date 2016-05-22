@@ -216,13 +216,14 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             error_text = exception_format(get_current_function_name(), e)
             print error_text
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
-
-if __name__ == '__main__':
+if __name__ == 'WooYun':
+    pass
+elif __name__ == '__main__':
     robot_WooYun = WooYun('../Config/KeyWords.txt', '../Events/EventsID.txt')
     # tmp = robot_WooYun.api_request()
     # print tmp.headers.get('Set-Cookie')
     # robot_WooYun.data_achieve(robot_WooYun.api_request())
-    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
+    # robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
     # dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')
     # print dom
     # print des
