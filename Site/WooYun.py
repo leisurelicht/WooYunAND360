@@ -186,32 +186,38 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                         # 1. 在title中继续检查第二关键字是否存在
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
-                                                         detail.get('id'))
+                                                         detail.get('id'),
+                                                         value.get('TAG'))
                                     elif des and (value.get('KEY2') in des):
                                         # 2. 在事件描述中查找是否存在第二关键字
                                         self.send_record(detail.get('title').strip(),
                                                          detail.get('link'),
-                                                         detail.get('id'))
+                                                         detail.get('id'),
+                                                         value.get('TAG'))
                                 elif value.get('URL') and dom and (value.get('URL') in dom):
                                     # 二级关键词不中的话继续查域名
                                     # 3. 进入页面检查厂商域名
                                     self.send_record(detail.get('title').strip(),
                                                      detail.get('link'),
-                                                     detail.get('id'))
+                                                     detail.get('id'),
+                                                     value.get('TAG'))
                                 # elif value.get('KEY2') is None and value.get('URL') is not None:
                                 #     # 会减少因域名导致的漏报,但也会增加误报
                                 #     self.send_record(detail.get('title').strip(),
                                 #                          detail.get('link'),
                                 #                          detail.get('id'))
                                 else:
-                                    continue
-                        else:
-                            # 不存在二级关键词和域名的情况下,这就是中了嘛.
-                            self.send_record(detail.get('title').strip(),
+                                    # 不存在二级关键词和域名的情况下,这就是中了嘛.
+                                    self.send_record(detail.get('title').strip(),
                                              detail.get('link'),
-                                             detail.get('id'))
+                                             detail.get('id'),
+                                             value.get('TAG'))
+                        else:
+                            pass
+
+
                     else:
-                        print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
+                        print "事件标题中不存在监看关键词『", key1, "』,开始检测下一关键词"
         except Exception as e:
             error_text = exception_format(get_current_function_name(), e)
             print error_text
@@ -223,7 +229,7 @@ elif __name__ == '__main__':
     # tmp = robot_WooYun.api_request()
     # print tmp.headers.get('Set-Cookie')
     # robot_WooYun.data_achieve(robot_WooYun.api_request())
-    # robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
+    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
     # dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')
     # print dom
     # print des
