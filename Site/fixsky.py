@@ -71,8 +71,8 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
 
     def domain_description_achieve(self, url):
         """
-        获取WooYun事件页面中的描述部分和厂商域名
-        :param url: wooyun漏洞页面
+        获取360补天事件页面中的描述部分和厂商域名
+        :param url: 360补天漏洞事件页面
         :return: （domain,description）domain可能为None, description可能为''
         """
         print 'WooYun_domain_description_achieve'
