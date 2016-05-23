@@ -32,7 +32,7 @@ class MailCreate(object):
         self.smtp_server_port = '0'
         self.sender = '0'
         self.receiver = []
-        self.receiver_admin = '0'
+        self.receiver_admin = []
         self.username = '0'
         self.password = '0'
         try:
@@ -51,9 +51,28 @@ class MailCreate(object):
         格式化一个邮件地址
         返回一个被格式化为 '别名<email address>' 的邮件地址
         """
+        # if isinstance(s, unicode):
+        #     name, address = parseaddr(s)
+        #     return formataddr((Header(name, 'utf-8').encode(),
+        #                        address.encode('utf-8') if isinstance(address, unicode) else address))
+        # elif isinstance(s, list):
+        #     add_list = []
+        #     # name = unicode(name)
+        #     for address in s:
+        #         add_list.append(formataddr((Header(name, 'utf-8').encode(),
+        #                                     address.encode('utf-8') if isinstance(address, unicode) else address)))
+        #     return ','.join(add_list)
         name, address = parseaddr(s)
-        return formataddr((Header(name, 'utf-8').encode(),
-                           address.encode('utf-8') if isinstance(address, unicode) else address))
+        return formataddr((Header(name, 'utf-8').encode(),address.encode('utf-8') if isinstance(address, unicode) else address))
+
+    def _format_address_list(self,s):
+        add_list = []
+        # name = unicode(name)
+        for address in s:
+            add_list.append(formataddr((Header('', 'utf-8').encode(),
+                                        address.encode('utf-8') if isinstance(address, unicode) else address)))
+        return ','.join(add_list)
+
 
     def mail_init(self):
         """
@@ -69,10 +88,9 @@ class MailCreate(object):
             self.smtp_server = self.config.get(self.Mail, 'SmtpServer').strip()
             self.smtp_server_port = self.config.get(self.Mail, "SmtpServer_Port").strip()
             self.sender = self.config.get(self.Mail, "SenderMail")
-            # self.receiver = self.config.get(self.Mail, "ReceiverMail").split(',')
-            self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
             self.username = self.config.get(self.Mail, "MailName").strip()
             self.password = self.config.get(self.Mail, "MailPassword").strip()
+            self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
         except ConfigParser.NoSectionError:
             print "*" * 34
             print "*" * 10, "邮箱未进行配置", "*" * 10
@@ -86,26 +104,24 @@ class MailCreate(object):
         else:
             print "『邮箱配置成功』"
 
-    def receiver_get(self,keyword_tag):
+    def receiver_get(self, keyword_tag):
         """
         根据keyword的tag获取相应的邮箱地址
         :param keyword_tag:KeyWords最后的TAG
         :return:
         """
-
-        address_tag= self.address.items("User_Address")
+        address_tag = self.address.items("User_Address")
         for tmp in address_tag:
             if str(keyword_tag) in tmp[1].split(','):
                 self.receiver.append(tmp[0])
 
-
     def send_warn_email(self, title, message, message_type):
         pass
 
-    def send_vulnerability_email(self,title, url, tag):
+    def send_vulnerability_email(self, title, url, tag):
         pass
 
-    def send_text_email(self, title, message, message_type):  #tag
+    def send_text_email(self, title, message, message_type):
         """
         发送文本邮件
         没有返回值
@@ -130,21 +146,18 @@ class MailCreate(object):
                 print '成功登陆邮箱'
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
-                    msg['To'] = self._format_address(u'Dollars<%s> ' % ','.join(self.receiver))
-                    print msg['To']
-                    # 这里有receiver为多个人时无法正确被格式化的问题.
-                    # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
-                    # ''.join(self.receiver)只能格式化第一个邮箱地址
+                    msg['To'] = self._format_address_list(self.receiver)
+                    print 'msg', msg['To']
                     smtp.sendmail(self.sender, self.receiver, msg.as_string())
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
                     print '开始发送问题邮件'
-                    msg['To'] = self._format_address(u'Admin<%s>' % ','.join(self.receiver_admin))
+                    msg['To'] = self._format_address(u'Admin<Admin>')
                     smtp.sendmail(self.sender, self.receiver_admin, msg.as_string())
                     print '成功发送问题邮件'
                 elif message_type == "time_report":
                     print '开始发送运行报告邮件'
-                    msg['To'] = self._format_address(u'Admin<%s>' % ','.join(self.receiver_admin))
+                    msg['To'] = self._format_address(u'Admin<Admin>')
                     smtp.sendmail(self.sender, self.receiver_admin, msg.as_string())
                     print '成功发送运行报告邮件'
             except smtplib.SMTPAuthenticationError:
@@ -154,7 +167,7 @@ class MailCreate(object):
                     time.sleep(10)
                     continue
                 else:
-                    print '正在尝试更换邮箱...'
+                    print '更换邮箱后重试...'
                     self.Mail_choose = not self.Mail_choose
                     self.mail_init()
                     self.count = 0
@@ -162,20 +175,19 @@ class MailCreate(object):
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
                 print error_text
+                time.sleep(10)
                 continue
             else:
                 smtp.quit()
                 self.count = 0
                 break
 
-
-
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test.receiver_get(5)
-    test.send_text_email("test",'good',"securityInfo")
+    test.send_text_email("test", 'good', "securityInfo")
     # test.send_text_email("test",'good',"time_report")
-
+    #
     # test2 = mail('测试机器人')
     # while True:
     # test2.send_text_email("test",'test message',"securityInfo")
