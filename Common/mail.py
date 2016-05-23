@@ -32,7 +32,7 @@ class MailCreate(object):
         self.smtp_server_port = '0'
         self.sender = '0'
         self.receiver = []
-        self.receiver_admin = []
+        self.receiver_admin = '0'
         self.username = '0'
         self.password = '0'
         try:
@@ -110,10 +110,12 @@ class MailCreate(object):
         :param keyword_tag:KeyWords最后的TAG
         :return:
         """
+
         address_tag = self.address.items("User_Address")
         for tmp in address_tag:
             if str(keyword_tag) in tmp[1].split(','):
                 self.receiver.append(tmp[0])
+        print 'receiver',self.receiver
 
     def send_warn_email(self, title, message, message_type):
         pass
@@ -146,8 +148,10 @@ class MailCreate(object):
                 print '成功登陆邮箱'
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
-                    msg['To'] = self._format_address_list(self.receiver)
-                    print 'msg', msg['To']
+                    # self.receiver = ['leisurelylicht@126.com','licht00@163.com']
+                    msg['To'] = self._format_address(u'Dollars<leisurelylicht@126.com>')
+                    # msg['To'] = 'Dollars<362864550@qq.com>'
+                    print 'msg', msg
                     smtp.sendmail(self.sender, self.receiver, msg.as_string())
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
@@ -185,8 +189,10 @@ class MailCreate(object):
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test.receiver_get(5)
-    test.send_text_email("test", 'good', "securityInfo")
-    # test.send_text_email("test",'good',"time_report")
+    # test.send_text_email("test", 'info', "securityInfo")
+
+    test.send_text_email("test", 'bad', "ExceptionInfo")
+    # test.send_text_email("test",'time',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
