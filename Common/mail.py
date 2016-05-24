@@ -160,8 +160,8 @@ class MailCreate(object):
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
                     print '开始发送问题邮件'
-                    msg['To'] = self._format_addr(u'Admin<Admin>')
-                    smtp.sendmail(self.sender, self.receiver_admin, msg.as_string())
+                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送问题邮件'
                 elif message_type == "time_report":
                     print '开始发送运行报告邮件'
@@ -195,8 +195,8 @@ if __name__ == '__main__':
     test.receiver_get(5)
     #test.send_text_email("test", 'info', "securityInfo")
 
-    # test.send_text_email("test", 'bad', "ExceptionInfo")
-    test.send_text_email("time",'time report',"time_report")
+    test.send_text_email("except", 'bad', "ExceptionInfo")
+    # test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
