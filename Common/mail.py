@@ -99,8 +99,7 @@ class MailCreate(object):
             self.sender = self.config.get(self.Mail, "SenderMail")
             self.username = self.config.get(self.Mail, "MailName").strip()
             self.password = self.config.get(self.Mail, "MailPassword").strip()
-            #self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
-            self.receiver_admin = self.config.get(self.Mail,"ReceiverMail_Admin").split(',')
+            self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
         except ConfigParser.NoSectionError:
             print "*" * 34
             print "*" * 10, "邮箱未进行配置", "*" * 10
@@ -194,9 +193,9 @@ class MailCreate(object):
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test.receiver_get(5)
-    test.send_text_email("test", 'info', "securityInfo")
+    #test.send_text_email("test", 'info', "securityInfo")
 
-    #test.send_text_email("except", 'bad', "ExceptionInfo")
+    test.send_text_email("except", 'bad', "ExceptionInfo")
     # test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
