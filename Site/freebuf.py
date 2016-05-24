@@ -88,8 +88,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                                                      self.freebuf_base_url + detail.get('link'),
                                                      detail.get('link').split('/')[-1])
                         else:
-                            self.send_record(detail.get(
-                                    'title'),
+                            self.send_record(detail.get('title'),
                                              self.freebuf_base_url + detail.get('link'),
                                              detail.get('link').split('/')[-1])
                     else:
