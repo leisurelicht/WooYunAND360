@@ -6,3 +6,5 @@
 *.txt
 
 .idea
+
+mailconfig.ini
