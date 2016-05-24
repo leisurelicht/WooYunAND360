@@ -45,25 +45,34 @@ class MailCreate(object):
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
-    @staticmethod
-    def _format_address(s):
-        """
+    # @staticmethod
+    # def _format_address(s):
+    #     """
+    #     格式化一个邮件地址
+    #     返回一个被格式化为 '别名<email address>' 的邮件地址
+    #     """
+    #     # if isinstance(s, unicode):
+    #     #     name, address = parseaddr(s)
+    #     #     return formataddr((Header(name, 'utf-8').encode(),
+    #     #                        address.encode('utf-8') if isinstance(address, unicode) else address))
+    #     # elif isinstance(s, list):
+    #     #     add_list = []
+    #     #     # name = unicode(name)
+    #     #     for address in s:
+    #     #         add_list.append(formataddr((Header(name, 'utf-8').encode(),
+    #     #                                     address.encode('utf-8') if isinstance(address, unicode) else address)))
+    #     #     return ','.join(add_list)
+    #     name, address = parseaddr(s)
+    #     return formataddr((Header(name, 'utf-8').encode(),address.encode('utf-8') if isinstance(address, unicode) else address))
+
+    def _format_addr(self,s):
+        '''
         格式化一个邮件地址
         返回一个被格式化为 '别名<email address>' 的邮件地址
-        """
-        # if isinstance(s, unicode):
-        #     name, address = parseaddr(s)
-        #     return formataddr((Header(name, 'utf-8').encode(),
-        #                        address.encode('utf-8') if isinstance(address, unicode) else address))
-        # elif isinstance(s, list):
-        #     add_list = []
-        #     # name = unicode(name)
-        #     for address in s:
-        #         add_list.append(formataddr((Header(name, 'utf-8').encode(),
-        #                                     address.encode('utf-8') if isinstance(address, unicode) else address)))
-        #     return ','.join(add_list)
-        name, address = parseaddr(s)
-        return formataddr((Header(name, 'utf-8').encode(),address.encode('utf-8') if isinstance(address, unicode) else address))
+        '''
+        name , addr = parseaddr(s)
+        return formataddr(( Header(name,'utf-8').encode(),\
+                          addr.encode('utf-8') if isinstance(addr,unicode) else addr ))
 
     def _format_address_list(self,s):
         add_list = []
@@ -90,7 +99,8 @@ class MailCreate(object):
             self.sender = self.config.get(self.Mail, "SenderMail")
             self.username = self.config.get(self.Mail, "MailName").strip()
             self.password = self.config.get(self.Mail, "MailPassword").strip()
-            self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
+            #self.receiver_admin = self.address.get('Admin_Address', "ReceiverMail_Admin").split(',')
+            self.receiver_admin = self.config.get(self.Mail,"ReceiverMail_Admin").split(',')
         except ConfigParser.NoSectionError:
             print "*" * 34
             print "*" * 10, "邮箱未进行配置", "*" * 10
@@ -115,13 +125,7 @@ class MailCreate(object):
         for tmp in address_tag:
             if str(keyword_tag) in tmp[1].split(','):
                 self.receiver.append(tmp[0])
-        print 'receiver',self.receiver
-
-    def send_warn_email(self, title, message, message_type):
-        pass
-
-    def send_vulnerability_email(self, title, url, tag):
-        pass
+        # print 'receiver',self.receiver
 
     def send_text_email(self, title, message, message_type):
         """
@@ -134,7 +138,7 @@ class MailCreate(object):
         """
         print 'send_text_email %s ' % title
         msg = MIMEText(message, 'plain', 'utf-8')  # 中文参数‘utf-8’，单字节字符不需要
-        msg['From'] = self._format_address(u'%s<%s>' % (self.mailName, self.sender))
+        msg['From'] = self._format_addr(u'%s<%s>' % (self.mailName, self.sender))
         msg['Subject'] = Header(title)
         while 1:
             try:
@@ -149,20 +153,20 @@ class MailCreate(object):
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
                     # self.receiver = ['leisurelylicht@126.com','licht00@163.com']
-                    msg['To'] = self._format_address(u'Dollars<leisurelylicht@126.com>')
-                    # msg['To'] = 'Dollars<362864550@qq.com>'
+                    #msg['To'] = self._format_address(u'Dollars<leisurelylicht@126.com>')
+                    msg['To'] = ','.join(self.receiver)
                     print 'msg', msg
                     smtp.sendmail(self.sender, self.receiver, msg.as_string())
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
                     print '开始发送问题邮件'
-                    msg['To'] = self._format_address(u'Admin<Admin>')
+                    msg['To'] = self._format_addr(u'Admin<Admin>')
                     smtp.sendmail(self.sender, self.receiver_admin, msg.as_string())
                     print '成功发送问题邮件'
                 elif message_type == "time_report":
                     print '开始发送运行报告邮件'
-                    msg['To'] = self._format_address(u'Admin<Admin>')
-                    smtp.sendmail(self.sender, self.receiver_admin, msg.as_string())
+                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送运行报告邮件'
             except smtplib.SMTPAuthenticationError:
                 print '认证失败,邮箱连接可能出问题了'
@@ -189,10 +193,10 @@ class MailCreate(object):
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test.receiver_get(5)
-    # test.send_text_email("test", 'info', "securityInfo")
+    #test.send_text_email("test", 'info', "securityInfo")
 
-    test.send_text_email("test", 'bad', "ExceptionInfo")
-    # test.send_text_email("test",'time',"time_report")
+    # test.send_text_email("test", 'bad', "ExceptionInfo")
+    test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
