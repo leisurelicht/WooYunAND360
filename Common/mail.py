@@ -45,42 +45,24 @@ class MailCreate(object):
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
-    # @staticmethod
-    # def _format_address(s):
-    #     """
-    #     格式化一个邮件地址
-    #     返回一个被格式化为 '别名<email address>' 的邮件地址
-    #     """
-    #     # if isinstance(s, unicode):
-    #     #     name, address = parseaddr(s)
-    #     #     return formataddr((Header(name, 'utf-8').encode(),
-    #     #                        address.encode('utf-8') if isinstance(address, unicode) else address))
-    #     # elif isinstance(s, list):
-    #     #     add_list = []
-    #     #     # name = unicode(name)
-    #     #     for address in s:
-    #     #         add_list.append(formataddr((Header(name, 'utf-8').encode(),
-    #     #                                     address.encode('utf-8') if isinstance(address, unicode) else address)))
-    #     #     return ','.join(add_list)
-    #     name, address = parseaddr(s)
-    #     return formataddr((Header(name, 'utf-8').encode(),address.encode('utf-8') if isinstance(address, unicode) else address))
-
-    def _format_addr(self,s):
-        '''
+    def _format_addr(self,s,name=''):
+        """
         格式化一个邮件地址
-        返回一个被格式化为 '别名<email address>' 的邮件地址
-        '''
-        name , addr = parseaddr(s)
-        return formataddr(( Header(name,'utf-8').encode(),\
-                          addr.encode('utf-8') if isinstance(addr,unicode) else addr ))
-
-    def _format_addr_list(self,s):
-        add_list = []
-        # name = unicode(name)
-        for address in s:
-            add_list.append(formataddr((Header('', 'utf-8').encode(),
-                                        address.encode('utf-8') if isinstance(address, unicode) else address)))
-        return ','.join(add_list)
+        :param s: 邮件地址
+        :param name: 邮件地址的别名,默认为空
+        :return: 返回一个被格式化为 '别名<email address>' 的邮件地址
+        """
+        if isinstance(s,unicode):
+            name, address = parseaddr(s)
+            return formataddr((Header(name, 'utf-8').encode(),
+                               address.encode('utf-8') if isinstance(address, unicode) else address))
+        elif isinstance(s, list):
+            add_list = []
+            # name = unicode(name)
+            for address in s:
+                add_list.append(formataddr((Header(name, 'utf-8').encode(),
+                                            address.encode('utf-8') if isinstance(address, unicode) else address)))
+            return ','.join(add_list)
 
 
     def mail_init(self):
@@ -152,21 +134,20 @@ class MailCreate(object):
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
                     #msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
-                    msg[ 'To' ] = self._format_addr_list(self.receiver)
-                    # 这里有receiver为多个人时无法正确被格式化.
-                    # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
-                    # ''.join(self.receiver)只能格式化第一个邮箱地址
+                    msg[ 'To' ] = self._format_addr(self.receiver)
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
                     print '成功发送事件邮件'
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
                     print '开始发送问题邮件'
-                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    #msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    msg[ 'To' ] = self._format_addr(self.receiver_admin,'Admin')
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送问题邮件'
                 elif message_type == "time_report":
                     print '开始发送运行报告邮件'
-                    msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    #msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
+                    msg[ 'To' ] = self._format_addr(self.receiver_admin,'Admin')
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送运行报告邮件'
             except smtplib.SMTPAuthenticationError:
@@ -196,8 +177,8 @@ if __name__ == '__main__':
     test.receiver_get(5)
     test.send_text_email("test", 'info', "securityInfo")
 
-    #test.send_text_email("except", 'bad', "ExceptionInfo")
-    # test.send_text_email("time",'time report',"time_report")
+    test.send_text_email("except", 'bad', "ExceptionInfo")
+    test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
