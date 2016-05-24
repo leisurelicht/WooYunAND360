@@ -74,7 +74,7 @@ class MailCreate(object):
         return formataddr(( Header(name,'utf-8').encode(),\
                           addr.encode('utf-8') if isinstance(addr,unicode) else addr ))
 
-    def _format_address_list(self,s):
+    def _format_addr_list(self,s):
         add_list = []
         # name = unicode(name)
         for address in s:
@@ -151,7 +151,8 @@ class MailCreate(object):
                 print '成功登陆邮箱'
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
-                    msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
+                    #msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
+                    msg[ 'To' ] = self._format_addr_list(self.receiver)
                     # 这里有receiver为多个人时无法正确被格式化.
                     # ','join(self.receiver)无法正确格式化,貌似是%s长度有限制
                     # ''.join(self.receiver)只能格式化第一个邮箱地址
@@ -193,9 +194,9 @@ class MailCreate(object):
 if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test.receiver_get(5)
-    #test.send_text_email("test", 'info', "securityInfo")
+    test.send_text_email("test", 'info', "securityInfo")
 
-    test.send_text_email("except", 'bad', "ExceptionInfo")
+    #test.send_text_email("except", 'bad', "ExceptionInfo")
     # test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
