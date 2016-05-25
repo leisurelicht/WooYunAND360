@@ -125,7 +125,7 @@
 
 关键字通过与标题和域名逐级比对确定是否为需要监看的事件.
 
-不过目前只有wooyun和360补天可以用
+只有wooyun和360补天可以用
 
 ----
 
@@ -137,7 +137,7 @@
 
 配置 Config/mail_address.ini 文件增加用户邮箱地址
 
-    Admin_Address:ReceiveMail_Admin中的邮箱地址接受运行报告邮件和异常邮件
+    Admin_Address:ReceiveMail_Admin的value为邮箱地址,接受运行报告邮件和异常邮件
     User_Address下的key为邮箱地址,接收安全事件邮件
     value为KeyWords中的TAG,不同的漏洞事件向相应的地址发送邮件
     
