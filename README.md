@@ -30,7 +30,7 @@
 
 ----
 
-修改 Config/KeyWords.txt 文件可以增加要监看的关键字.格式为json.
+修改 Config/KeyWords.txt 文件可以增加要监看的关键字,格式为json.
 
 基本格式为:
 
