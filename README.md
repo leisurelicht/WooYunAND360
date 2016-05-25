@@ -13,6 +13,11 @@
 
 事件提醒通过邮件发送
 
+    2016/5/25
+    增加不同漏洞向不同地址发送邮件的功能
+
+    
+
 ----
 
 
@@ -34,7 +39,8 @@
         [
             {
                 "KEY2":"%精确的第二个关键字%"KEY[2],
-                "URL1":"%域名%"[URL]  
+                "URL1":"%域名%"[URL]
+                "TAG":1
             }
         ]
     }
@@ -46,6 +52,7 @@
         [
             {
                 "URL1":"%域名%"
+                "TAG":1
             }
         ]
     }
@@ -54,9 +61,12 @@
 
      {
         "%关键字%":
-        []
+        [
+            "TAG":1
+        ]
     }
-  
+
+只有TAG不可省略
 
 范例如下:
 
@@ -65,52 +75,55 @@
         [
             {
                 "KEY2":"银华",
-                "URL1":"yufund.com.cn"
+                "URL":"yufund.com.cn",
+                "TAG":1
             },
             {
                 "KEY2":"嘉实",
-                "URL1":"jsfund.cn"
+                "URL":"jsfund.cn",
+                "TAG":2
             },
             {
                 "KEY2":"长盛",
-                "URL1":"csfunds.com.cn"
-            }
-        ],
-        "银行":[
+                "URL":"csfunds.com.cn",
+                "TAG":3
+            },
             {
-                KEY2":"宁夏",
-                "URL":["bankofnx.com.cn","ycccb.com.cn"]
+                "KEY2":"诺安",
+                "TAG":4
             }
         ],
-        "同花顺":
+        "银行":
         [
             {
-                "URL1":"10jqka.com.cn"
+                "KEY2":"宁夏",
+                "URL":["bankofnx.com.cn","ycccb.com.cn"],
+                "TAG":5
             }
         ],
-        "当当网":
-        []
-    
+        "新浪":
+        [
+            {
+                "URL":"sina.com.cn",
+                "TAG":6
+            }
+        ],
+        "联通":
+        [
+            {
+                "KEY2":"中国",
+                "TAG":6
+            }
+        ],
+        "华为":
+        [
+            {
+                "TAG":7
+            }
+        ]
     }
 
 关键字通过与标题和域名逐级比对确定是否为需要监看的事件.
-
-规则为
-    
-    if KEY[1] in title:
-        if KEY[2] and URL:
-            if KEY[2]:
-                if KEY[2] in title:
-                    发送邮件
-                elif KEY[2] in description:
-                    发送邮件
-            elif URL and 厂商域名:
-                if URL == 厂商域名:
-                    发送邮件
-            else:
-                检查下一个关键字
-        else：
-            发送邮件
 
 不过目前只有wooyun和360补天可以用
 
@@ -121,6 +134,21 @@
 [MailOne]为主要使用邮箱设置.
 
 [MailTwo]为备用邮箱,主邮箱无法连接时会自动切换使用备用邮箱.
+
+配置 Config/mail_address.ini 文件增加用户邮箱地址
+
+    Admin_Address:ReceiveMail_Admin中的邮箱地址接受运行报告邮件和异常邮件
+    User_Address下的key为邮箱地址,接收安全事件邮件
+    value为KeyWords中的TAG,不同的漏洞事件向相应的地址发送邮件
+    
+范例为:
+
+    [Admin_Address]
+    ReceiverMail_Admin : xxx@126.com,yyy@163.com,zzz@qq.com
+    [User_Address]
+    xxx@126.com:1,3,5,6,7
+    yyy@163.com:2,4,5,7
+    zzz@qq.com:5
 
 ----
 
