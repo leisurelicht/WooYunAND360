@@ -1,17 +1,18 @@
 #! usr/bin/env python
-# -*- coding=utf-8 -*-
+# -*- coding:utf-8 -*-
 
-import sys
+
 import time
 import smtplib
 import ConfigParser
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
-from Common.common import exception_format, get_current_function_name
+from common import exception_format, get_current_function_name
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# import sys
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 
 class MailCreate(object):
@@ -121,7 +122,7 @@ class MailCreate(object):
         """
         print 'send_text_email %s ' % title
         msg = MIMEText(message, 'plain', 'utf-8')  # 中文参数‘utf-8’，单字节字符不需要
-        msg['From'] = self._format_addr(u'%s<%s>' % (self.mailName, self.sender))
+        msg['From'] = self._format_addr(u'%s<%s>' % (unicode(self.mailName, 'utf-8'), self.sender))
         msg['Subject'] = Header(title)
         while 1:
             try:
@@ -175,10 +176,12 @@ class MailCreate(object):
                 break
 
 if __name__ == '__main__':
-    test1 = MailCreate('测试机器人')
+    import sys
+    print sys.getdefaultencoding()
+    test = MailCreate('测试机器人')
     test2 = MailCreate('测试机器人')
-    #test.receiver_get(5)
-    #test.send_text_email("test", 'info', "securityInfo")
+    test.receiver_get(5)
+    test.send_text_email("test", 'info', "securityInfo")
 
     #test.send_text_email("except", 'bad', "ExceptionInfo")
     #test.send_text_email("time",'time report',"time_report")
