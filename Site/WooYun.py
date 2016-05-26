@@ -7,7 +7,7 @@ import logging
 from lxml import etree
 from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
-from Common.common import *
+from Common.common import exception_format, get_current_function_name
 
 reload(sys)
 sys.setdefaultencoding('utf8')

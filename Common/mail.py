@@ -1,5 +1,6 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
+
 import sys
 import time
 import smtplib
@@ -7,7 +8,7 @@ import ConfigParser
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
-from common import *
+from Common.common import exception_format, get_current_function_name
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -62,6 +63,7 @@ class MailCreate(object):
             for address in s:
                 add_list.append(formataddr((Header(name, 'utf-8').encode(),
                                             address.encode('utf-8') if isinstance(address, unicode) else address)))
+
             return ','.join(add_list)
 
 
@@ -173,12 +175,13 @@ class MailCreate(object):
                 break
 
 if __name__ == '__main__':
-    test = MailCreate('测试机器人')
-    test.receiver_get(5)
-    test.send_text_email("test", 'info', "securityInfo")
+    test1 = MailCreate('测试机器人')
+    test2 = MailCreate('测试机器人')
+    #test.receiver_get(5)
+    #test.send_text_email("test", 'info', "securityInfo")
 
-    test.send_text_email("except", 'bad', "ExceptionInfo")
-    test.send_text_email("time",'time report',"time_report")
+    #test.send_text_email("except", 'bad', "ExceptionInfo")
+    #test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
