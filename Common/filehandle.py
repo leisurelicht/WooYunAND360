@@ -10,11 +10,11 @@ import time
 import mail
 import random
 from tld import get_tld
-from common import *
+from common import exception_format, get_current_function_name
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-logging.basicConfig()
+# reload(sys)
+# sys.setdefaultencoding('utf8')
+# logging.basicConfig()
 
 
 class FileHandle(mail.MailCreate):
@@ -177,7 +177,7 @@ class FileHandle(mail.MailCreate):
     def file_md5_get(self):
         """
         获取文件的MD5值
-        返回一个MD5值
+        :return: 一个文件的MD5值
         """
         print 'file_md5_get'
         try:
