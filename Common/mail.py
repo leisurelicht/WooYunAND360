@@ -47,14 +47,15 @@ class MailCreate(object):
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
-    def _format_addr(self,s,name=''):
+    @staticmethod
+    def _format_addr(s, name=''):
         """
         格式化一个邮件地址
         :param s: 邮件地址
         :param name: 邮件地址的别名,默认为空
         :return: 返回一个被格式化为 '别名<email address>' 的邮件地址
         """
-        if isinstance(s,unicode):
+        if isinstance(s,basestring):
             name, address = parseaddr(s)
             return formataddr((Header(name, 'utf-8').encode(),
                                address.encode('utf-8') if isinstance(address, unicode) else address))
@@ -136,20 +137,17 @@ class MailCreate(object):
                 print '成功登陆邮箱'
                 if message_type == "securityInfo":
                     print '开始发送事件邮件'
-                    #msg[ 'To' ] = self._format_addr(u'Dollars<%s> ' % ','.join(self.receiver) )
                     msg[ 'To' ] = self._format_addr(self.receiver)
                     smtp.sendmail( self.sender , self.receiver , msg.as_string() )
                     print '成功发送事件邮件'
                     print '成功发送事件邮件'
                 elif message_type == "ExceptionInfo":
                     print '开始发送问题邮件'
-                    #msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
                     msg[ 'To' ] = self._format_addr(self.receiver_admin,'Admin')
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送问题邮件'
                 elif message_type == "time_report":
                     print '开始发送运行报告邮件'
-                    #msg[ 'To' ] = self._format_addr(u'Admin<%s>' % ','.join(self.receiver_admin) )
                     msg[ 'To' ] = self._format_addr(self.receiver_admin,'Admin')
                     smtp.sendmail( self.sender , self.receiver_admin , msg.as_string() )
                     print '成功发送运行报告邮件'
@@ -181,12 +179,13 @@ if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test2 = MailCreate('测试机器人')
     test.receiver_get(5)
-    test.send_text_email("test", 'info', "securityInfo")
+    test.send_text_email("security", 'info', "securityInfo")
 
-    #test.send_text_email("except", 'bad', "ExceptionInfo")
-    #test.send_text_email("time",'time report',"time_report")
+    # test.send_text_email("except", 'bad', "ExceptionInfo")
+    # test.send_text_email("time",'time report',"time_report")
     #
     # test2 = mail('测试机器人')
     # while True:
     # test2.send_text_email("test",'test message',"securityInfo")
     # time.sleep(5)
+
