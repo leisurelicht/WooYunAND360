@@ -2,7 +2,6 @@
 # -*- coding=utf-8 -*-
 
 import os
-import json
 import logging
 import hashlib
 import requests
@@ -11,6 +10,11 @@ import mail
 import random
 from tld import get_tld
 from common import exception_format, get_current_function_name
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -96,19 +100,22 @@ class FileHandle(mail.MailCreate):
         print "domain_get"
         return get_tld(url)
 
+    @property
     def events_id_read(self):
         """
         从文件中读取已经发送过邮件的事件ID
-        返回一个list
+        返回一个iter
+        :return:
         """
         print "events_id_read"
-        error_id = []
+        # error_id = []
         if os.path.exists(self.events_Id_file):
-            with open(self.events_Id_file) as errors:
+            with open(self.events_Id_file, 'r') as errors:
                 for error in errors:
                     if not error.isspace():
-                        error_id.append(error.strip())
-            return error_id
+                        yield error.strip()
+                        # error_id.append(error.strip())
+            # return error_id
         else:
             file_path, file_name = os.path.split(self.events_Id_file)
             if not os.path.exists(file_path):
@@ -117,31 +124,34 @@ class FileHandle(mail.MailCreate):
                 tmp = open(self.events_Id_file, 'a')
                 tmp.close()
 
-    @staticmethod
-    def events_id_check(new_id, events_id_list):
+    def events_id_check(self, new_id):
         """
         通过ID确定事件是否已经被发送过
-        返回一个list
-        如果list里包含0,则已被发送过
+        返回True或False
+        True则曾经被发送过
         :param new_id: 新事件的ID
-        :param events_id_list: 事件的ID集合
         """
         print 'events_id_check'
-        temp = []
-        if len(events_id_list) > 0:
-            for eventId in events_id_list:
-                if not eventId.isspace():
-                    temp.append(cmp(eventId, new_id))
-        return temp
+        # temp = []
+        # if len(events_id_list) > 0:
+        #     for eventId in events_id_list:
+        #         if not eventId.isspace():
+        #             temp.append(cmp(eventId, new_id))
+        # return temp
+        for eventId in self.events_id_read:
+            if cmp(eventId, new_id) == 0:
+                return True
+        else:
+            return False
+
 
     def events_id_add(self, new_id):
         """
         向EventsID.txt文件中加入一个事件ID
         :param new_id: 事件ID
         """
-        tmp = open(self.events_Id_file, 'a')
-        tmp.write(new_id + '\n')
-        tmp.close()
+        with open(self.events_Id_file, 'a') as tmp:
+            tmp.write(new_id + '\n')
 
     @property
     def key_words_read(self):
@@ -156,9 +166,10 @@ class FileHandle(mail.MailCreate):
             try:
                 keywordslist = json.loads(tmp)
             except (AttributeError, ValueError):
-                error_text = "请检查关键词文件格式是否正确"
+                error_text = "请检查关键词文件格式是否为正确的json格式"
                 print error_text
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
+                # raise AttributeError, ValueError
                 exit(0)
             except Exception as e:
                 error_text = exception_format(get_current_function_name(), e)
@@ -200,18 +211,30 @@ class FileHandle(mail.MailCreate):
         :param event_url:
         :param event_title:
         """
-        check_result = self.events_id_check(event_id, self.events_id_list)
-        if 0 not in check_result:
-            try:
-                self.receiver_get(keyword_tag)
-                self.send_text_email(event_title, event_url, 'securityInfo')
-            except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
-                print error_text
-                # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
-            else:
-                self.events_id_list.append(event_id)
-                self.events_id_add(event_id)
+        # check_result = self.events_id_check(event_id, self.events_id_list)
+        # if 0 not in check_result:
+        #     try:
+        #         self.receiver_get(keyword_tag)
+        #         self.send_text_email(event_title, event_url, 'securityInfo')
+        #     except Exception as e:
+        #         error_text = exception_format(get_current_function_name(), e)
+        #         print error_text
+        #         # self.send_text_email( 'Program Exception' , error_text , 'ExceptionInfo' )
+        #     else:
+        #         self.events_id_list.append(event_id)
+        #         self.events_id_add(event_id)
+        # else:
+        #     print event_title, " Same thing was sent,did not send same mail to everyone"
+        check_result = self.events_id_check(event_id)
+        if not check_result:
+           try:
+               self.receiver_get(keyword_tag)
+               self.send_text_email(event_title, event_url, 'securityInfo')
+           except Exception as e:
+               error_text = exception_format(get_current_function_name(), e)
+               print error_text
+           else:
+               self.events_id_add(event_id)
         else:
             print event_title, " Same thing was sent,did not send same mail to everyone"
 
@@ -230,4 +253,6 @@ if __name__ == '__main__':
     #    if b:
     #        a = b
     #    time.sleep(5)
-    a=test.key_words_read()
+    # for i in test.events_id_read:
+    #     print i
+    print test.events_id_check('QTVA-2015-364565')
