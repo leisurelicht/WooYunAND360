@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
 from Common.common import exception_format, get_current_function_name
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 logging.basicConfig()
 
 
@@ -17,7 +17,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         super(FixSky, self).__init__('启明360补天监看机器人', keys_file, events_id_file)
         self.url = 'http://loudong.360.cn/vul/list'
         self._360base_url = 'http://loudong.360.cn'
-        self.events_id_list = self.events_id_read()
+        # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
         self.html = 0
@@ -75,7 +75,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
         :param url: 360补天漏洞事件页面
         :return: （domain,description）domain可能为None, description可能为''
         """
-        print 'WooYun_domain_description_achieve'
+        print '360_domain_description_achieve'
         page = self.request(url=url, header=self.headers)
         if page:
             page = page.content
@@ -86,6 +86,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             if u'已注册' in dom_exi:
                 url2 = soup.find(href=re.compile(u'/vul/search/c/'))['href']
                 dom_page = self.request(self._360base_url+url2, self.headers)
+                print "dom_page",dom_page
                 if dom_page:
                     print 'url:',dom_page.url
                     raw_dom = BeautifulSoup(dom_page.content, "html5lib")
@@ -133,24 +134,28 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                                         # print '1.',_360title
                                         self.send_record(detail.get('title'),
                                                          self._360base_url + detail.get('link'),
-                                                         detail.get('link').split('/')[-1])
+                                                         detail.get('link').split('/')[-1],
+                                                         value.get('TAG'))
                                     # 1. 检查第二关键字是否存在描述中
                                     elif des and (value.get('KEY2') in des):
                                         self.send_record(detail.get('title'),
                                                          self._360base_url + detail.get('link'),
-                                                         detail.get('link').split('/')[-1])
+                                                         detail.get('link').split('/')[-1],
+                                                         value.get('TAG'))
                                 elif value.get('URL') and dom and (value.get('URL') in dom):
                                     # print '3.',_360title
                                     self.send_record(detail.get('title'),
                                                      self._360base_url + detail.get('link'),
-                                                     detail.get('link').split('/')[-1])
+                                                     detail.get('link').split('/')[-1],
+                                                     value.get('TAG'))
                                 else:
                                     continue
                         else:
                             # print '2.',_360title
                             self.send_record(detail.get('title'),
                                              self._360base_url + detail.get('link'),
-                                             detail.get('link').split('/')[-1])
+                                             detail.get('link').split('/')[-1],
+                                             value.get('TAG'))
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:

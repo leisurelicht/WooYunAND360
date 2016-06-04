@@ -1,14 +1,14 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
 
-import re
+
 import logging
 from bs4 import BeautifulSoup
 from Common import mail, filehandle
 from Common.common import exception_format, get_current_function_name
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 logging.basicConfig()
 
 
@@ -18,7 +18,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         super(FreeBuf, self).__init__('启明漏洞盒子监看机器人', keys_file, events_id_file)
         self.url = 'https://www.vulbox.com/board/internet/page/'
         self.freebuf_base_url = 'https://www.vulbox.com'
-        self.events_id_list = self.events_id_read()
+        # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
         self.html = 0
@@ -78,7 +78,8 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                                     if value.get('KEY2') in title:
                                         self.send_record(detail.get('title'),
                                                          self.freebuf_base_url + detail.get('link'),
-                                                         detail.get('link').split('/')[-1])
+                                                         detail.get('link').split('/')[-1],
+                                                         value.get('TAG'))
                                     # else: #二级关键词不中的话继续查域名和内容
                                         # 2. 进入页面检查厂商域名
                                         # 3. 在页面内查找是否存在第二关键字
@@ -86,11 +87,13 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                                 elif value.get('KEY2') is None:
                                     self.send_record(detail.get('title'),
                                                      self.freebuf_base_url + detail.get('link'),
-                                                     detail.get('link').split('/')[-1])
+                                                     detail.get('link').split('/')[-1],
+                                                     value.get('TAG'))
                         else:
                             self.send_record(detail.get('title'),
                                              self.freebuf_base_url + detail.get('link'),
-                                             detail.get('link').split('/')[-1])
+                                             detail.get('link').split('/')[-1],
+                                             value.get('TAG'))
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:

@@ -1,5 +1,6 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
+
 import requests
 import time
 import socket
@@ -9,8 +10,8 @@ from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
 from Common.common import exception_format, get_current_function_name
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 logging.basicConfig()
 
 
@@ -20,7 +21,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
     def __init__(self, keys_file, events_id_file):
         super(WooYun, self).__init__('启明WooYun监看机器人', keys_file, events_id_file)
         self.wooyun_url = 'http://api.wooyun.org/bugs/submit'
-        self.events_id_list = self.events_id_read()
+        # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
         socket.setdefaulttimeout = 30
@@ -214,8 +215,6 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                                              value.get('TAG'))
                         else:
                             pass
-
-
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』,开始检测下一关键词"
         except Exception as e:
