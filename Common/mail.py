@@ -109,10 +109,11 @@ class MailCreate(object):
         :param keyword_tag:KeyWords最后的TAG
         :return:
         """
-
         address_tag = self.address.items("User_Address")
         for tmp in address_tag:
-            if str(keyword_tag) in tmp[1].split(','):
+            if tmp[1].strip() == '*':
+                self.receiver.append(tmp[0])
+            elif str(keyword_tag) in tmp[1].split(','):
                 self.receiver.append(tmp[0])
         # print 'receiver',self.receiver
 
@@ -181,7 +182,7 @@ if __name__ == '__main__':
     test = MailCreate('测试机器人')
     test2 = MailCreate('测试机器人')
     test.receiver_get(5)
-    test.send_text_email("security", 'info', "securityInfo")
+    #test.send_text_email("security", 'info', "securityInfo")
 
     # test.send_text_email("except", 'bad', "ExceptionInfo")
     # test.send_text_email("time",'time report',"time_report")
