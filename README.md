@@ -139,16 +139,17 @@
 
     Admin_Address:ReceiveMail_Admin的value为邮箱地址,接受运行报告邮件和异常邮件
     User_Address下的key为邮箱地址,接收安全事件邮件
-    value为KeyWords中的TAG,不同的漏洞事件向相应的地址发送邮件
+    value为KeyWords中的TAG,不同的漏洞事件向相应的地址发送邮件,'*'代表全选所有TAG
     
 范例为:
 
     [Admin_Address]
     ReceiverMail_Admin : xxx@126.com,yyy@163.com,zzz@qq.com
     [User_Address]
-    xxx@126.com:1,3,5,6,7
+    xxx@126.com:1,3,5,6,7 //当出现TAG为1、3、5、6、7的事件时向xxx@126邮箱发邮件
     yyy@163.com:2,4,5,7
     zzz@qq.com:5
+    aaa@gmail.com:* //所有事件都向aaa.@gmail.com邮箱发邮件
 
 ----
 
