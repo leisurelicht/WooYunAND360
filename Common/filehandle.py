@@ -139,7 +139,7 @@ class FileHandle(mail.MailCreate):
         #             temp.append(cmp(eventId, new_id))
         # return temp
         for eventId in self.events_id_read:
-            if cmp(eventId, new_id) == 0:
+            if eventId == new_id.strip():
                 return True
         else:
             return False
