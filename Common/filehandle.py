@@ -202,7 +202,7 @@ class FileHandle(mail.MailCreate):
         else:
             return md5temp
 
-    def send_record(self, event_title, event_url, event_id, keyword_tag):  # tag
+    def send_record(self, event_title, event_url, event_id, keyword_tag):
         """
         调用邮件发送函数并记录被发送的事件ID
         没有返回值

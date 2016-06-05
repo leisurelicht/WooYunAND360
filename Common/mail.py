@@ -47,6 +47,10 @@ class MailCreate(object):
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
+    @property
+    def get_mail_config(self):
+        return self.Mail,self.smtp_server_port
+
     @staticmethod
     def _format_addr(s, name=''):
         """
@@ -174,8 +178,6 @@ class MailCreate(object):
                 break
 
 if __name__ == '__main__':
-    import sys
-    print sys.getdefaultencoding()
     test = MailCreate('测试机器人')
     test2 = MailCreate('测试机器人')
     test.receiver_get(5)

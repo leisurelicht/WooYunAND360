@@ -1,7 +1,8 @@
 #! usr/bin/env python
 # -*- coding=utf-8 -*-
+
 import pymongo
-from common import *
+from common import exception_format, get_current_function_name
 
 host = "localhost"
 port = 27017
