@@ -8,7 +8,7 @@ import logging
 from lxml import etree
 from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
-from Common.common import exception_format, get_current_function_name
+from Common.common import exception_format
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -19,7 +19,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
     """docstring for WooYun"""
 
     def __init__(self, keys_file, events_id_file):
-        super(WooYun, self).__init__('启明WooYun监看机器人', keys_file, events_id_file)
+        super(WooYun, self).__init__('WooYun监看机器人', keys_file, events_id_file)
         self.wooyun_url = 'http://api.wooyun.org/bugs/submit'
         # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
@@ -78,13 +78,13 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                 self.count += 1
                 continue
             except requests.exceptions.HTTPError as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
                 time.sleep(600)
                 self.count += 1
                 continue
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
                 self.count += 1
                 continue
@@ -121,7 +121,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
             try:
                 data = text.json()
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
                 text = self.page_request()
             else:
@@ -140,7 +140,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
         try:
             soup = BeautifulSoup(page, "html5lib")
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             print error_text
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
         else:
@@ -218,7 +218,7 @@ class WooYun(filehandle.FileHandle, mail.MailCreate):
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』,开始检测下一关键词"
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             print error_text
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
 if __name__ == 'WooYun':
@@ -228,7 +228,7 @@ elif __name__ == '__main__':
     # tmp = robot_WooYun.api_request()
     # print tmp.headers.get('Set-Cookie')
     # robot_WooYun.data_achieve(robot_WooYun.api_request())
-    robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
+    # robot_WooYun.key_words_check(robot_WooYun.data_achieve(robot_WooYun.api_request()))
     # dom, des = robot_WooYun.domain_description_achieve('http://www.wooyun.org/bugs/wooyun-2015-0163298')
     # print dom
     # print des

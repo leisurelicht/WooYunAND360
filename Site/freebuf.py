@@ -5,7 +5,7 @@
 import logging
 from bs4 import BeautifulSoup
 from Common import mail, filehandle
-from Common.common import exception_format, get_current_function_name
+from Common.common import exception_format
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -15,13 +15,13 @@ logging.basicConfig()
 class FreeBuf(filehandle.FileHandle, mail.MailCreate):
     """docstring for FreeBuf"""
     def __init__(self, keys_file, events_id_file):
-        super(FreeBuf, self).__init__('启明漏洞盒子监看机器人', keys_file, events_id_file)
+        super(FreeBuf, self).__init__('漏洞盒子监看机器人', keys_file, events_id_file)
         self.url = 'https://www.vulbox.com/board/internet/page/'
         self.freebuf_base_url = 'https://www.vulbox.com'
         # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
-        self.html = 0
+        self.html = ''
         # self.count = 0
 
     def __del__(self):
@@ -40,7 +40,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
             try:
                 soup = BeautifulSoup(page, "html5lib")
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
             else:
                 #titles = soup.find_all('a',href=re.compile("/bugs/vulbox"), target="_blank")
@@ -54,12 +54,12 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
         # database.insert_data(self.con, data)
         return data
 
-    def key_words_check(self, events):
+    def key_words_check(self, data):
         """
         检查获得的标题中是否含有要监看的关键字
         函数内调用sendRecord()
         没有返回值
-        :param events:
+        :param data:
         """
         print 'freebuf_keyWords_check'
         md5value = self.file_md5_get
@@ -67,7 +67,7 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
             self.key_words_list = self.key_words_read
             self.fileMd5 = md5value
         try:
-            for detail in events:
+            for detail in data:
                 title = detail.get('title').lower()
                 print title
                 for key1, values in self.key_words_list.iteritems():
@@ -90,14 +90,11 @@ class FreeBuf(filehandle.FileHandle, mail.MailCreate):
                                                      detail.get('link').split('/')[-1],
                                                      value.get('TAG'))
                         else:
-                            self.send_record(detail.get('title'),
-                                             self.freebuf_base_url + detail.get('link'),
-                                             detail.get('link').split('/')[-1],
-                                             value.get('TAG'))
+                            pass
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
 
 

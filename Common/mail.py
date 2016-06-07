@@ -8,7 +8,7 @@ import ConfigParser
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
-from common import exception_format, get_current_function_name
+from common import exception_format
 
 # import sys
 # reload(sys)
@@ -43,7 +43,7 @@ class MailCreate(object):
             self.config.read("../Config/mailconfig.ini")
             self.address.read("../Config/mail_address.ini")
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             print error_text
         self.mail_init()  # mailInit函数只在此处被调用
 
@@ -98,7 +98,7 @@ class MailCreate(object):
             print "*" * 34
             exit(0)
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             print error_text
         else:
             print "『邮箱配置成功』"
@@ -169,7 +169,7 @@ class MailCreate(object):
                     self.count = 0
                     continue
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 print error_text
                 time.sleep(10)
                 continue

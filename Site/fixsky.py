@@ -4,23 +4,23 @@ import re
 import logging
 from bs4 import BeautifulSoup
 from Common import mail, filehandle, database
-from Common.common import exception_format, get_current_function_name
+from Common.common import exception_format
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
-logging.basicConfig()
+# logging.basicConfig()
 
 
 class FixSky(filehandle.FileHandle, mail.MailCreate):
     """docstring for fix360"""
     def __init__(self, keys_file, events_id_file):
-        super(FixSky, self).__init__('启明360补天监看机器人', keys_file, events_id_file)
+        super(FixSky, self).__init__('360补天监看机器人', keys_file, events_id_file)
         self.url = 'http://loudong.360.cn/vul/list'
         self._360base_url = 'http://loudong.360.cn'
         # self.events_id_list = self.events_id_read
         self.key_words_list = self.key_words_read
         self.fileMd5 = self.file_md5_get
-        self.html = 0
+        self.html = ''
         self.count = 0
 
         self.headers = {
@@ -53,7 +53,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             try:
                 soup = BeautifulSoup(page, "html5lib")
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
             else:
                 titles = soup.find_all(href=re.compile("/vul/info/qid"))
@@ -102,7 +102,7 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
             else:
                 return None, des
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             print error_text
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
             return None, None
@@ -148,18 +148,12 @@ class FixSky(filehandle.FileHandle, mail.MailCreate):
                                                      self._360base_url + detail.get('link'),
                                                      detail.get('link').split('/')[-1],
                                                      value.get('TAG'))
-                                else:
-                                    continue
                         else:
-                            # print '2.',_360title
-                            self.send_record(detail.get('title'),
-                                             self._360base_url + detail.get('link'),
-                                             detail.get('link').split('/')[-1],
-                                             value.get('TAG'))
+                            pass
                     else:
                         print "事件标题中不存在监看关键词『", key1, "』开始检测下一关键词"
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
 
 

@@ -2,7 +2,7 @@
 # -*- coding=utf-8 -*-
 
 import pymongo
-from common import exception_format, get_current_function_name
+from common import exception_format
 
 host = "localhost"
 port = 27017
@@ -11,7 +11,7 @@ def connect_wooyun():
     try:
         client = pymongo.MongoClient(host, port)
     except Exception as e:
-        error_text = exception_format(get_current_function_name(), e)
+        error_text = exception_format(e)
         print error_text
     else:
         db = client.WooYunand360
@@ -23,7 +23,7 @@ def connect_fixsky():
     try:
         client = pymongo.MongoClient(host, port)
     except Exception as e:
-        error_text = exception_format(get_current_function_name(), e)
+        error_text = exception_format(e)
         print error_text
     else:
         db = client.WooYunand360
@@ -35,7 +35,7 @@ def connect_freebuf():
     try:
         client = pymongo.MongoClient(host, port)
     except Exception as e:
-        error_text = exception_format(get_current_function_name(), e)
+        error_text = exception_format(e)
         print error_text
     else:
         db = client.WooYunand360
@@ -50,7 +50,7 @@ def insert_data(collection, database):
         elif isinstance(database, dict):
             collection.insert_one(database)
     except Exception as e:
-        error_text = exception_format(get_current_function_name(), e)
+        error_text = exception_format(e)
         print error_text
 
 

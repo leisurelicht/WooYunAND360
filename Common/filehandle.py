@@ -9,12 +9,12 @@ import time
 import mail
 import random
 from tld import get_tld
-from common import exception_format, get_current_function_name
+from common import exception_format
 
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 # reload(sys)
 # sys.setdefaultencoding('utf8')
@@ -54,13 +54,13 @@ class FileHandle(mail.MailCreate):
                 count += 1
                 continue
             except requests.exceptions.HTTPError as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 count += 1
                 self.send_text_email('Important Program Exception', error_text, 'ExceptionInfo')
                 time.sleep(600)
                 continue
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 count += 1
                 print error_text
                 self.send_text_email('Program Exception', error_text, 'ExceptionInfo')
@@ -69,11 +69,11 @@ class FileHandle(mail.MailCreate):
                 if page.status_code == 200:
                     return page  # get page
                     # time.sleep(random.randint(0,60))
-                else:
-                    error_text = "Page Code %s " % page.status_code
-                    count += 1
-                    self.send_text_email('Page Error', error_text, 'ExceptionInfo')
-                    continue
+                # else:
+                #     error_text = "Page Code %s " % page.status_code
+                #     count += 1
+                #     self.send_text_email('Page Error', error_text, 'ExceptionInfo')
+                #     continue
 
     def page_request(self):
         """
@@ -172,7 +172,7 @@ class FileHandle(mail.MailCreate):
                 # raise AttributeError, ValueError
                 exit(0)
             except Exception as e:
-                error_text = exception_format(get_current_function_name(), e)
+                error_text = exception_format(e)
                 print error_text
                 self.send_text_email("Program Exception", error_text, "ExceptionInfo")
             else:
@@ -197,7 +197,7 @@ class FileHandle(mail.MailCreate):
                 file_md5.update(file_temp.read().strip())
                 md5temp = file_md5.hexdigest()
         except Exception as e:
-            error_text = exception_format(get_current_function_name(), e)
+            error_text = exception_format(e)
             self.send_text_email("Program Exception", error_text, "ExceptionInfo")
         else:
             return md5temp
@@ -255,4 +255,4 @@ if __name__ == '__main__':
     #    time.sleep(5)
     # for i in test.events_id_read:
     #     print i
-    print test.events_id_check('QTVA-2015-364565')
+    print test.file_md5_get
